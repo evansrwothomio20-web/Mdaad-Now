@@ -1,0 +1,102 @@
+:root {
+      --terracotta: #D27D56;
+      --terracotta-light: #E8A882;
+      --cream: #FFF8F0;
+      --cream-dark: #F0E4D7;
+      --bark: #2D1B0E;
+      --bark-light: #6B5344;
+      --verified: #2D7A3A;
+      --pending: #C4960C;
+      --unverified: #B83B2E;
+      --border: #E2D1BF;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--cream); color: var(--bark); margin:0; overflow-x:hidden; }
+    h1,h2,h3 { font-family: 'DM Serif Display', Georgia, serif; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius:4px; }
+
+    /* SOS pulse */
+    @keyframes sosPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(184,59,46,0.5); }
+      50% { box-shadow: 0 0 0 12px rgba(184,59,46,0); }
+    }
+    .sos-pulse { animation: sosPulse 2s ease-in-out infinite; }
+
+    /* Fade in */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.35s ease-out forwards; }
+    .fade-up-delay-1 { animation-delay: 0.07s; opacity:0; }
+    .fade-up-delay-2 { animation-delay: 0.14s; opacity:0; }
+    .fade-up-delay-3 { animation-delay: 0.21s; opacity:0; }
+
+    /* Slide up panel */
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .slide-up { animation: slideUp 0.3s cubic-bezier(0.32,0.72,0,1) forwards; }
+
+    /* Shimmer for verified badge */
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .verified-shimmer {
+      background: linear-gradient(90deg, var(--verified) 30%, #3DA34D 50%, var(--verified) 70%);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    /* Subtle background pattern */
+    .bg-pattern {
+      background-image: radial-gradient(circle at 1px 1px, rgba(45,27,14,0.03) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    /* Tab transition */
+    .tab-content { transition: opacity 0.2s ease; }
+
+    /* Leaflet overrides */
+    .leaflet-container { background: var(--cream-dark) !important; font-family: 'DM Sans', sans-serif !important; }
+    .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; }
+    .leaflet-popup-content { margin: 12px 16px !important; font-family: 'DM Sans', sans-serif !important; }
+
+    /* Custom marker */
+    .map-marker {
+      width:28px; height:28px; border-radius:50%; border:3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2); display:flex; align-items:center;
+      justify-content:center; font-size:11px; color:white; font-weight:700;
+    }
+
+    /* Toast */
+    @keyframes toastIn {
+      from { transform: translateY(-20px); opacity:0; }
+      to { transform: translateY(0); opacity:1; }
+    }
+    @keyframes toastOut {
+      from { opacity:1; }
+      to { opacity:0; transform: translateY(-10px); }
+    }
+    .toast-in { animation: toastIn 0.3s ease forwards; }
+    .toast-out { animation: toastOut 0.3s ease forwards; }
+
+    /* Bottom safe area */
+    .bottom-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+    /* Focus visible */
+    *:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; border-radius: 4px; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* Stat card hover */
+    .stat-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .stat-card:active { transform: scale(0.97); }
