@@ -448,17 +448,25 @@
         </div>
 
         <!-- Quick actions -->
-        <div className="fade-up fade-up-delay-2 flex gap-2">
-          <button onClick=${props.onSuggest}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
-            style=${{backgroundColor:'var(--terracotta)'}}
+        <div className="fade-up fade-up-delay-2 flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2 flex-1">
+            <button onClick=${props.onSuggest}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
+              style=${{backgroundColor:'var(--terracotta)'}}
+            >
+              <i className="fa-solid fa-plus"></i> Report Update
+            </button>
+            <button onClick=${function(){ props.setTab('resources'); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-cream-darker text-bark text-sm font-semibold transition-all active:scale-[0.97]"
+            >
+              <i className="fa-solid fa-magnifying-glass"></i> Find Help
+            </button>
+          </div>
+          <button onClick=${props.onDonate}
+            className="flex-1 sm:flex-none sm:px-6 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
+            style=${{backgroundColor:'var(--verified)'}}
           >
-            <i className="fa-solid fa-plus"></i> Report Update
-          </button>
-          <button onClick=${function(){ props.setTab('resources'); }}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-cream-darker text-bark text-sm font-semibold transition-all active:scale-[0.97]"
-          >
-            <i className="fa-solid fa-magnifying-glass"></i> Find Help
+            <i className="fa-solid fa-heart"></i> Donate Now
           </button>
         </div>
 
@@ -773,6 +781,51 @@
   }
 
   // =========================================================
+  // DONATION MODAL
+  // =========================================================
+  function DonationModal(props) {
+    var options = [
+      { id: 'global1', name: 'PayPal International', icon: 'fa-brands fa-paypal', region: 'Global', type: 'paypal' },
+      { id: 'global2', name: 'Bitcoin / Crypto', icon: 'fa-brands fa-bitcoin', region: 'Global', type: 'crypto' },
+      { id: 'eu1', name: 'SEPA Bank Transfer', icon: 'fa-solid fa-building-columns', region: 'Europe', type: 'bank' },
+      { id: 'af1', name: 'Mobile Money (M-Pesa)', icon: 'fa-solid fa-mobile-screen', region: 'Africa', type: 'mobile' },
+      { id: 'asia1', name: 'AliPay / WeChat', icon: 'fa-brands fa-alipay', region: 'Asia', type: 'app' },
+    ];
+
+    return html`
+      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Donation options">
+        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full bottom-safe overflow-y-auto" style=${{maxWidth:'480px',maxHeight:'90vh'}}>
+          <div className="sticky top-0 bg-cream pt-5 pb-3 px-6 flex items-center justify-between border-b border-cream-darker">
+            <h2 className="text-lg text-bark">Support Our Mission</h2>
+            <button onClick=${props.onClose} className="w-9 h-9 rounded-full bg-cream-dark flex items-center justify-center text-bark-light" aria-label="Close">
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div className="p-6 space-y-4">
+            <p className="text-sm text-bark-lighter mb-4">Choose a convenient payment method for your region to help fund humanitarian efforts.</p>
+            ${options.map(function(opt) {
+              return html`
+                <button key=${opt.id} onClick=${function(){ showToast('Redirecting to ' + opt.name + '...', 'info'); props.onClose(); }} 
+                  className="w-full flex items-center gap-4 p-4 bg-white rounded-xl border border-cream-darker hover:border-terracotta/30 transition-all active:scale-[0.98]">
+                  <div className="w-10 h-10 rounded-full bg-cream-dark flex items-center justify-center flex-shrink-0 text-terracotta">
+                    <i className=${opt.icon + ' text-lg'}></i>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-semibold text-bark text-sm">${opt.name}</div>
+                    <div className="text-xs text-bark-lighter mt-0.5"><i className="fa-solid fa-globe mr-1 text-bark-lighter opacity-70"></i>${opt.region}</div>
+                  </div>
+                  <i className="fa-solid fa-arrow-up-right-from-square text-bark-lighter text-sm opacity-50"></i>
+                </button>
+              `;
+            })}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
   // MAIN APP
   // =========================================================
   function App() {
@@ -790,6 +843,9 @@
 
     var showSuggestRef = useState(false);
     var showSuggest = showSuggestRef[0], setShowSuggest = showSuggestRef[1];
+
+    var showDonationRef = useState(false);
+    var showDonation = showDonationRef[0], setShowDonation = showDonationRef[1];
 
     function handleRoleChange(role) {
       var names = { user:'Ahmed K.', verified_org:'Hope Beyond Borders', admin:'Coordination Lead' };
@@ -847,7 +903,7 @@
 
         <!-- Tab content -->
         <main className="flex-1 overflow-y-auto tab-content" style=${{paddingTop:'16px'}}>
-          ${tab==='home' && html`<${HomeView} user=${user} updates=${updates} resources=${MOCK_RESOURCES} onSuggest=${function(){ setShowSuggest(true); }} setTab=${setTab} />`}
+          ${tab==='home' && html`<${HomeView} user=${user} updates=${updates} resources=${MOCK_RESOURCES} onSuggest=${function(){ setShowSuggest(true); }} onDonate=${function(){ setShowDonation(true); }} setTab=${setTab} />`}
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
           ${tab==='resources' && html`<${ResourcesView} resources=${MOCK_RESOURCES} user=${user} />`}
           ${tab==='briefs' && html`<${BriefsView} user=${user} updates=${updates} onVerify=${handleVerify} onReject=${handleReject} onSuggest=${function(){ setShowSuggest(true); }} />`}
@@ -892,6 +948,7 @@
         <!-- Modals -->
         ${showSOS ? html`<${SOSPanel} onClose=${function(){ setShowSOS(false); }} />` : null}
         ${showSuggest ? html`<${SuggestModal} user=${user} onClose=${function(){ setShowSuggest(false); }} onSubmit=${handleSuggest} />` : null}
+        ${showDonation ? html`<${DonationModal} onClose=${function(){ setShowDonation(false); }} />` : null}
 
         <!-- Toasts -->
         <${ToastContainer} />
