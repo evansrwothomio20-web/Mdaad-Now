@@ -832,7 +832,7 @@
     var tabRef = useState('home');
     var tab = tabRef[0], setTab = tabRef[1];
 
-    var userRef = useState({ name:'Ahmed K.', role:'user' });
+    var userRef = useState({ name:'Civilian', role:'user' });
     var user = userRef[0], setUser = userRef[1];
 
     var updatesRef = useState(INITIAL_UPDATES);
@@ -848,7 +848,7 @@
     var showDonation = showDonationRef[0], setShowDonation = showDonationRef[1];
 
     function handleRoleChange(role) {
-      var names = { user:'Ahmed K.', verified_org:'Hope Beyond Borders', admin:'Coordination Lead' };
+      var names = { user:'Civilian', verified_org:'Verified NGO', admin:'Admin' };
       setUser({ name: names[role] || 'User', role: role });
       showToast('Switched to ' + (role==='user'?'Civilian':role==='verified_org'?'Verified NGO':'Admin') + ' view', 'info');
     }
