@@ -85,12 +85,12 @@
   // =========================================================
   const MOCK_RESOURCES = [
     { id:1, name:'Al-Rahma Medical Center', category:'hospital', verification_status:'verified', address:'District 5, Sector A, Building 12', phone:'+905551234567', whatsapp:'+905551234567', description:'24/7 emergency care, pediatrics, and maternal health services. Currently operating at 80% capacity.', capacity:'150 beds' },
-    { id:2, name:'Hope Beyond Borders', category:'ngo', verification_status:'verified', address:'Sector C, Aid Coordination Office', phone:'+905559876543', whatsapp:'+905559876543', description:'Food distribution and non-food item provisioning. Running daily kitchen serving 800 meals.', capacity:'800 meals/day' },
+    { id:2, name:'Hope Beyond Borders', category:'ngo', verification_status:'verified', address:'Sector C, Aid Coordination Office', phone:'+905559876543', whatsapp:'+905559876543', description:'Food distribution and non-food item provisioning. Running daily kitchen serving 800 meals.', capacity:'800 meals/day', stock_level: 8, wishlist: ['Blankets', 'Rice', 'Cooking Oil'] },
     { id:3, name:'Shelter Point Alpha', category:'shelter', verification_status:'verified', address:'District 3, Old School Compound', phone:'+905553456789', whatsapp:'+905553456789', description:'Transitional shelter for displaced families. Warm meals, bedding, and psychosocial support available.', capacity:'120 families' },
     { id:4, name:'Blue Crescent Clinic', category:'hospital', verification_status:'verified', address:'District 7, Main Road', phone:'+905557654321', whatsapp:'+905557654321', description:'Primary healthcare, vaccination program, and chronic disease management.', capacity:'60 patients/day' },
-    { id:5, name:'Neighbors Aid Coalition', category:'ngo', verification_status:'pending', address:'Sector B, Community Center', phone:'+905552345678', whatsapp:null, description:'Volunteer-run group providing clothing and hygiene kits. Verification pending.', capacity:'200 kits/week' },
+    { id:5, name:'Neighbors Aid Coalition', category:'ngo', verification_status:'pending', address:'Sector B, Community Center', phone:'+905552345678', whatsapp:null, description:'Volunteer-run group providing clothing and hygiene kits. Verification pending.', capacity:'200 kits/week', stock_level: 45, wishlist: ['Hygiene Kits', 'Baby Formula'] },
     { id:6, name:'Emergency Shelter District 9', category:'shelter', verification_status:'unverified', address:'District 9, Near Mosque', phone:null, whatsapp:null, description:'Reported ad-hoc shelter. Not yet verified by coordination team.', capacity:'Unknown' },
-    { id:7, name:'Medical Relief International', category:'ngo', verification_status:'verified', address:'Sector A, Field Hospital', phone:'+905558765432', whatsapp:'+905558765432', description:'Mobile surgical unit and trauma stabilization point. Staffed by international volunteers.', capacity:'30 surgical cases/week' },
+    { id:7, name:'Medical Relief International', category:'ngo', verification_status:'verified', address:'Sector A, Field Hospital', phone:'+905558765432', whatsapp:'+905558765432', description:'Mobile surgical unit and trauma stabilization point. Staffed by international volunteers.', capacity:'30 surgical cases/week', stock_level: 95, wishlist: ['Surgical Masks', 'Bandages'] },
     { id:8, name:'Safe Haven Women\'s Shelter', category:'shelter', verification_status:'verified', address:'District 2, Confidential Location', phone:'+905554567890', whatsapp:'+905554567890', description:'Safe space for women and children with legal aid, counseling, and protection services.', capacity:'40 residents' },
   ];
 
@@ -102,6 +102,7 @@
     { id:'u5', created_at:'2024-01-15T07:30:00Z', location_coords:{lat:37.072,lat2:37.375}, description:'Water truck delivering to District 8 today. Bring your own containers. 10:00-14:00.', category:'Food', is_verified:false, image_url:null, reported_by:'Community Volunteer', reporter_role:'user' },
     { id:'u6', created_at:'2024-01-14T18:00:00Z', location_coords:{lat:37.065,lat2:37.385}, description:'Structural damage reported on Building 14, District 5. Do not enter. Assessment team en route.', category:'Safety', is_verified:true, image_url:null, reported_by:'Civil Defense', reporter_role:'verified_org' },
     { id:'u7', created_at:'2024-01-15T12:20:00Z', location_coords:{lat:37.061,lat2:37.392}, description:'Volunteer doctors offering free consultations at Sector D community tent. General medicine only.', category:'Health', is_verified:false, image_url:null, reported_by:'Mariam T.', reporter_role:'user' },
+    { id:'u8', created_at:'2024-01-15T13:00:00Z', location_coords:{lat:37.060,lat2:37.380}, description:'Safe Haven Women\'s Shelter requires additional security personnel and dignity kits.', category:'Safety', is_verified:true, image_url:null, reported_by:'Coordinator', reporter_role:'admin', is_confidential: true },
   ];
 
   // =========================================================
@@ -204,6 +205,140 @@
               `;
             })}
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // REQUEST HELP & PIZZA TRACKER
+  // =========================================================
+  function PizzaTracker(props) {
+    const statuses = ['Pending', 'Dispatched', 'Fulfilled'];
+    const currentIndex = statuses.indexOf(props.status) !== -1 ? statuses.indexOf(props.status) : 0;
+    
+    return html`
+      <div className="w-full mt-4 bg-white p-4 rounded-xl border border-cream-darker">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold text-bark">Request Status</span>
+          <span className="text-xs font-bold text-terracotta uppercase">${props.status}</span>
+        </div>
+        <div className="flex items-center w-full relative">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-cream-dark rounded-full"></div>
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-terracotta rounded-full transition-all duration-500" style=${{width: (currentIndex / (statuses.length - 1)) * 100 + '%'}}></div>
+          
+          ${statuses.map((s, i) => {
+            const isActive = i <= currentIndex;
+            return html`
+              <div key=${s} className="relative z-10 flex flex-col items-center flex-1">
+                <div className=${'w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-500 ' + (isActive ? 'bg-terracotta border-terracotta text-white' : 'bg-white border-cream-darker text-bark-lighter')}>
+                  ${isActive ? html`<i className="fa-solid fa-check text-[10px]"></i>` : html`<div className="w-2 h-2 rounded-full bg-cream-darker"></div>`}
+                </div>
+                <span className=${'text-[10px] mt-1.5 font-bold uppercase tracking-wider transition-colors ' + (isActive ? 'text-bark' : 'text-bark-lighter')}>${s}</span>
+              </div>
+            `;
+          })}
+        </div>
+      </div>
+    `;
+  }
+
+  function RequestHelpModal(props) {
+    const [step, setStep] = useState(1);
+    const [form, setForm] = useState({ category:'Food', district:'', urgency:'Medium', description:'', is_confidential:false });
+    const [isSubmitting, setSubmitting] = useState(false);
+    const [submittedReq, setSubmittedReq] = useState(null);
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      setSubmitting(true);
+      const res = await apiFetch('/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      setSubmitting(false);
+      setSubmittedReq(Object.assign({status: 'Pending'}, form, {id: res?.id || genId()}));
+      showToast('Request submitted successfully', 'success');
+    }
+
+    if (submittedReq) {
+      return html`
+        <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
+          <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6 bottom-safe">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-verified/20 rounded-full flex items-center justify-center mx-auto mb-4 text-verified text-2xl">
+                <i className="fa-solid fa-check-circle"></i>
+              </div>
+              <h2 className="text-xl font-bold text-bark mb-1">Help is on the way</h2>
+              <p className="text-sm text-bark-lighter mb-4">Your request has been logged in the system.</p>
+            </div>
+            <${PizzaTracker} status=${submittedReq.status} />
+            <button onClick=${props.onClose} className="w-full mt-6 py-3 rounded-xl bg-terracotta text-white font-semibold text-sm">Close</button>
+          </div>
+        </div>
+      `;
+    }
+
+    return html`
+      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
+        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full max-w-md bottom-safe overflow-y-auto max-h-[90vh]">
+          <div className="sticky top-0 bg-cream pt-5 pb-3 px-6 flex items-center justify-between border-b border-cream-darker z-10">
+            <h2 className="text-lg text-bark">Request Help</h2>
+            <button type="button" onClick=${props.onClose} className="w-9 h-9 rounded-full bg-cream-dark flex items-center justify-center text-bark-light"><i className="fa-solid fa-xmark"></i></button>
+          </div>
+          <form onSubmit=${handleSubmit} className="p-6 space-y-4">
+            ${step === 1 ? html`
+              <div className="space-y-4 fade-in">
+                <div>
+                  <label className="block text-sm font-semibold text-bark mb-2">What do you need?</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    ${CATEGORIES.map(cat => html`
+                      <button key=${cat} type="button" onClick=${() => setForm(Object.assign({},form,{category:cat}))} 
+                        className=${'p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ' + (form.category===cat ? 'bg-terracotta/10 border-terracotta text-terracotta' : 'bg-white border-cream-darker text-bark-light')}>
+                        <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' text-xl'}></i>
+                        <span className="text-xs font-bold">${cat}</span>
+                      </button>
+                    `)}
+                  </div>
+                </div>
+                <button type="button" onClick=${() => setStep(2)} className="w-full py-3 rounded-xl bg-bark text-white font-semibold text-sm mt-4">Next Step <i className="fa-solid fa-arrow-right ml-1"></i></button>
+              </div>
+            ` : null}
+            ${step === 2 ? html`
+              <div className="space-y-4 fade-in">
+                <div>
+                  <label className="block text-sm font-semibold text-bark mb-1.5">District</label>
+                  <input type="text" value=${form.district} onInput=${e => setForm(Object.assign({},form,{district:e.target.value}))} required
+                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-terracotta/30 outline-none" placeholder="e.g. Sector 4, Downtown" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-bark mb-1.5">Urgency Level</label>
+                  <div className="flex gap-2">
+                    ${['Low','Medium','Critical'].map(level => html`
+                      <button key=${level} type="button" onClick=${() => setForm(Object.assign({},form,{urgency:level}))}
+                        className=${'flex-1 py-2 rounded-lg border text-xs font-semibold ' + (form.urgency===level ? (level==='Critical'?'bg-unverified border-unverified text-white':'bg-bark border-bark text-white') : 'bg-white border-cream-darker text-bark-light')}>
+                        ${level}
+                      </button>
+                    `)}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-bark mb-1.5">Additional Details</label>
+                  <textarea value=${form.description} onInput=${e => setForm(Object.assign({},form,{description:e.target.value}))} rows="2"
+                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-terracotta/30 outline-none"></textarea>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button type="button" onClick=${() => setStep(1)} className="w-1/3 py-3 rounded-xl bg-cream-dark text-bark font-semibold text-sm">Back</button>
+                  <button type="submit" disabled=${isSubmitting || !form.district} className="w-2/3 py-3 rounded-xl bg-terracotta text-white font-semibold text-sm disabled:opacity-50 flex justify-center items-center">
+                    ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin mr-2"></i>` : null} Submit Request
+                  </button>
+                </div>
+              </div>
+            ` : null}
+          </form>
         </div>
       </div>
     `;
@@ -368,6 +503,9 @@
     var waLink = whatsappLink(r.whatsapp);
     var callLink = telLink(r.phone);
 
+    var isNgo = r.category === 'ngo';
+    var isCriticallyLow = isNgo && r.stock_level !== undefined && r.stock_level < 10;
+
     return html`
       <div className="bg-white rounded-xl border border-cream-darker p-4 fade-up">
         <div className="flex items-start gap-3">
@@ -387,6 +525,34 @@
         <p className="text-xs text-bark-light mt-2.5 leading-relaxed">${r.description}</p>
         ${r.address ? html`<p className="text-xs text-bark-lighter mt-1.5"><i className="fa-solid fa-location-dot text-terracotta/60 mr-1.5"></i>${r.address}</p>` : null}
         ${r.capacity ? html`<p className="text-xs text-bark-lighter mt-1"><i className="fa-solid fa-people-group text-terracotta/60 mr-1.5"></i>${r.capacity}</p>` : null}
+        
+        ${isNgo && r.stock_level !== undefined ? html`
+          <div className="mt-3 p-3 bg-cream rounded-xl border border-cream-darker">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-xs font-semibold text-bark">Inventory Stock Level</span>
+              <span className=${'text-xs font-bold ' + (isCriticallyLow ? 'text-unverified' : 'text-verified')}>${r.stock_level}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-cream-darker rounded-full overflow-hidden mb-2">
+              <div className=${'h-full rounded-full ' + (isCriticallyLow ? 'bg-unverified' : 'bg-verified')} style=${{width: r.stock_level + '%'}}></div>
+            </div>
+            ${isCriticallyLow ? html`
+              <div className="text-[10px] text-unverified font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
+                <i className="fa-solid fa-triangle-exclamation"></i> Critically Low
+              </div>
+            ` : null}
+            ${r.wishlist && r.wishlist.length > 0 ? html`
+              <div>
+                <span className="text-[10px] text-bark-lighter uppercase tracking-wider font-bold block mb-1">Wishlist (Urgent Needs):</span>
+                <div className="flex flex-wrap gap-1">
+                  ${r.wishlist.map(item => html`
+                    <span key=${item} className="text-[10px] bg-white border border-cream-darker text-bark-light px-2 py-0.5 rounded-md">${item}</span>
+                  `)}
+                </div>
+              </div>
+            ` : null}
+          </div>
+        ` : null}
+
         <div className="flex gap-2 mt-3 pt-3 border-t border-cream-dark">
           ${waLink ? html`
             <a href=${waLink} target="_blank" rel="noopener noreferrer"
@@ -407,6 +573,95 @@
           ` : null}
           ${!waLink && !callLink ? html`
             <span className="flex-1 text-center py-2.5 text-xs text-bark-lighter italic">No contact info available</span>
+          ` : null}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // VOLUNTEER VIEW
+  // =========================================================
+  function VolunteerView(props) {
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [skills, setSkills] = useState([]);
+    const [tasks, setTasks] = useState(props.updates.filter(u => !u.is_verified)); // Open requests
+    const availableSkills = ['Medical', 'Logistics', 'Construction', 'Translation', 'Counseling'];
+
+    function handleRegister(e) {
+      e.preventDefault();
+      setIsRegistered(true);
+      showToast('Successfully registered as Volunteer', 'success');
+    }
+
+    function handleClaim(id) {
+      setTasks(prev => prev.filter(t => t.id !== id));
+      showToast('Task claimed! Thank you.', 'success');
+    }
+
+    if (!isRegistered) {
+      return html`
+        <div className="px-4 pb-6 space-y-4 fade-in">
+          <div className="text-center py-6">
+            <div className="w-16 h-16 bg-terracotta/10 rounded-full flex items-center justify-center mx-auto mb-4 text-terracotta text-2xl">
+              <i className="fa-solid fa-hands-holding-child"></i>
+            </div>
+            <h1 className="text-2xl text-bark font-bold mb-2">Join the Volunteer Force</h1>
+            <p className="text-sm text-bark-lighter">Register your skills and help your community when they need it most.</p>
+          </div>
+          <form onSubmit=${handleRegister} className="bg-white p-5 rounded-2xl border border-cream-darker space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-bark mb-2">Select your skills</label>
+              <div className="flex flex-wrap gap-2">
+                ${availableSkills.map(skill => {
+                  const active = skills.includes(skill);
+                  return html`
+                    <button key=${skill} type="button" 
+                      onClick=${() => setSkills(active ? skills.filter(s => s !== skill) : [...skills, skill])}
+                      className=${'px-3 py-2 rounded-lg text-xs font-semibold border transition-all ' + (active ? 'bg-terracotta text-white border-terracotta' : 'bg-white text-bark-light border-cream-darker')}>
+                      ${skill}
+                    </button>
+                  `;
+                })}
+              </div>
+            </div>
+            <button type="submit" disabled=${skills.length===0} className="w-full py-3 rounded-xl bg-bark text-white font-semibold text-sm disabled:opacity-50 mt-4">Complete Registration</button>
+          </form>
+        </div>
+      `;
+    }
+
+    return html`
+      <div className="px-4 pb-6 space-y-4 fade-in">
+        <div className="flex justify-between items-end mb-2">
+          <div>
+            <h1 className="text-2xl text-bark">Task Board</h1>
+            <p className="text-sm text-bark-lighter mt-0.5">Open requests needing assistance</p>
+          </div>
+          <div className="text-right">
+            <span className="text-xs font-bold text-terracotta bg-terracotta/10 px-2 py-1 rounded-lg">${tasks.length} Active</span>
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          ${tasks.map(t => html`
+            <div key=${t.id} className="bg-white p-4 rounded-xl border border-cream-darker fade-up">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-xs font-bold uppercase tracking-wide" style=${{color: CATEGORY_COLORS[t.category]||'#B83B2E'}}>${t.category}</span>
+                <span className="text-[10px] text-bark-lighter">${timeAgo(t.created_at)}</span>
+              </div>
+              <p className="text-sm text-bark mb-3">${t.description}</p>
+              ${t.location_coords ? html`<div className="text-xs text-bark-lighter mb-3"><i className="fa-solid fa-location-dot mr-1"></i> Nearby Location</div>` : null}
+              <button onClick=${() => handleClaim(t.id)} className="w-full py-2.5 rounded-lg bg-terracotta/10 text-terracotta font-semibold text-xs hover:bg-terracotta hover:text-white transition-colors">
+                <i className="fa-solid fa-handshake mr-1"></i> Claim Task
+              </button>
+            </div>
+          `)}
+          ${tasks.length === 0 ? html`
+            <div className="text-center py-12">
+              <i className="fa-solid fa-check-double text-3xl text-verified mb-3 opacity-50"></i>
+              <p className="text-sm text-bark-lighter">No open tasks right now.</p>
+            </div>
           ` : null}
         </div>
       </div>
@@ -450,24 +705,26 @@
         <!-- Quick actions -->
         <div className="fade-up fade-up-delay-2 flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2 flex-1">
+            <button onClick=${props.onRequestHelp}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
+              style=${{backgroundColor:'var(--bark)'}}
+            >
+              <i className="fa-solid fa-hand-holding-hand"></i> Request Help
+            </button>
             <button onClick=${props.onSuggest}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
               style=${{backgroundColor:'var(--terracotta)'}}
             >
               <i className="fa-solid fa-plus"></i> Report Update
             </button>
+          </div>
+          <div className="flex gap-2 flex-1 sm:flex-none">
             <button onClick=${function(){ props.setTab('resources'); }}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-cream-darker text-bark text-sm font-semibold transition-all active:scale-[0.97]"
+              className="flex-1 sm:px-6 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-cream-darker text-bark text-sm font-semibold transition-all active:scale-[0.97]"
             >
               <i className="fa-solid fa-magnifying-glass"></i> Find Help
             </button>
           </div>
-          <button onClick=${props.onDonate}
-            className="flex-1 sm:flex-none sm:px-6 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
-            style=${{backgroundColor:'var(--verified)'}}
-          >
-            <i className="fa-solid fa-heart"></i> Donate Now
-          </button>
         </div>
 
         <!-- Latest verified updates -->
@@ -560,28 +817,63 @@
 
       filtered.forEach(function(u) {
         if (!u.location_coords) return;
+        
+        var isAuthorized = props.user && (props.user.role === 'admin' || props.user.role === 'verified_org');
+        var isConfidential = u.is_confidential;
+        
+        var lat = u.location_coords.lat;
+        var lng = u.location_coords.lat2;
+        var displayDesc = u.description;
         var col = CATEGORY_COLORS[u.category] || '#6B5344';
-        var icon = L.divIcon({
-          className: '',
-          html: '<div class="map-marker" style="background:' + col + '"><i class="fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + '" style="font-size:11px"></i></div>',
-          iconSize: [28,28],
-          iconAnchor: [14,14],
-          popupAnchor: [0,-16],
-        });
-        var marker = L.marker([u.location_coords.lat, u.location_coords.lat2], {icon:icon}).addTo(map);
+        
         var verBadge = u.is_verified
           ? '<span style="background:var(--verified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">VERIFIED</span>'
           : '<span style="background:#F0E4D7;color:var(--bark-lighter);font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">PENDING</span>';
-        marker.bindPopup(
-          '<div style="min-width:180px">' +
-            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
-              verBadge +
-            '</div>' +
-            '<p style="font-size:13px;line-height:1.5;color:var(--bark);margin:0 0 6px 0">' + u.description + '</p>' +
-            '<span style="font-size:11px;color:var(--bark-lighter)">' + u.category + ' · ' + timeAgo(u.created_at) + '</span>' +
-          '</div>'
-        );
-        markersRef.current.push(marker);
+
+        if (isConfidential && !isAuthorized) {
+          // General area circle instead of exact marker
+          lat = Math.floor(lat * 100) / 100;
+          lng = Math.floor(lng * 100) / 100;
+          displayDesc = '<b style="color:var(--unverified)">Confidential Location</b><br/>General Area Only. Precise coordinates hidden for safety.';
+          var circle = L.circle([lat, lng], {
+            color: col,
+            fillColor: col,
+            fillOpacity: 0.2,
+            radius: 800,
+            stroke: false
+          }).addTo(map);
+          circle.bindPopup(
+            '<div style="min-width:180px">' +
+              '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
+                verBadge +
+                '<span style="background:var(--unverified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px"><i class="fa-solid fa-eye-slash mr-1"></i>HIDDEN</span>' +
+              '</div>' +
+              '<p style="font-size:13px;line-height:1.5;color:var(--bark);margin:0 0 6px 0">' + displayDesc + '</p>' +
+              '<span style="font-size:11px;color:var(--bark-lighter)">' + u.category + ' · ' + timeAgo(u.created_at) + '</span>' +
+            '</div>'
+          );
+          markersRef.current.push(circle);
+        } else {
+          var icon = L.divIcon({
+            className: '',
+            html: '<div class="map-marker" style="background:' + col + '"><i class="fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + '" style="font-size:11px"></i></div>',
+            iconSize: [28,28],
+            iconAnchor: [14,14],
+            popupAnchor: [0,-16],
+          });
+          var marker = L.marker([lat, lng], {icon:icon}).addTo(map);
+          var confBadge = isConfidential ? '<span style="background:var(--unverified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px"><i class="fa-solid fa-lock mr-1"></i>CONFIDENTIAL</span>' : '';
+          marker.bindPopup(
+            '<div style="min-width:180px">' +
+              '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
+                verBadge + confBadge +
+              '</div>' +
+              '<p style="font-size:13px;line-height:1.5;color:var(--bark);margin:0 0 6px 0">' + displayDesc + '</p>' +
+              '<span style="font-size:11px;color:var(--bark-lighter)">' + u.category + ' · ' + timeAgo(u.created_at) + '</span>' +
+            '</div>'
+          );
+          markersRef.current.push(marker);
+        }
       });
     }, [props.updates, mapFilter]);
 
@@ -677,6 +969,83 @@
               <p className="text-sm text-bark-lighter">No resources found matching your search</p>
             </div>
           ` : null}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // ANALYTICS VIEW
+  // =========================================================
+  function AnalyticsView(props) {
+    if (props.user.role !== 'admin') {
+      return html`
+        <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+          <i className="fa-solid fa-lock text-4xl text-cream-darker mb-4"></i>
+          <h2 className="text-xl text-bark font-bold mb-2">Access Denied</h2>
+          <p className="text-sm text-bark-lighter">You need Admin privileges to view this page.</p>
+        </div>
+      `;
+    }
+
+    const totalReq = props.updates.length;
+    const fulfilledReq = props.updates.filter(u => u.is_verified).length;
+    const categories = ['Food', 'Health', 'Safety', 'Shelter'];
+
+    return html`
+      <div className="px-4 pb-6 space-y-4 fade-in">
+        <div className="flex justify-between items-end mb-4">
+          <div>
+            <h1 className="text-2xl text-bark font-bold">Admin Analytics</h1>
+            <p className="text-sm text-bark-lighter">Gap Analysis & Heatmap</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-white p-4 rounded-xl border border-cream-darker text-center">
+            <div className="text-2xl font-bold text-bark">${totalReq}</div>
+            <div className="text-[10px] text-bark-lighter uppercase tracking-wider font-semibold">Total Requests</div>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-cream-darker text-center">
+            <div className="text-2xl font-bold text-verified">${fulfilledReq}</div>
+            <div className="text-[10px] text-bark-lighter uppercase tracking-wider font-semibold">Fulfilled / Verified</div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-cream-darker mb-4">
+          <h3 className="text-sm font-semibold text-bark mb-3">Needs by Category</h3>
+          <div className="space-y-3">
+            ${categories.map(cat => {
+              const count = props.updates.filter(u => u.category === cat).length;
+              const pct = totalReq ? Math.round((count / totalReq) * 100) : 0;
+              const col = CATEGORY_COLORS[cat];
+              return html`
+                <div key=${cat}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="font-semibold text-bark">${cat}</span>
+                    <span className="text-bark-lighter">${count} (${pct}%)</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-cream-darker rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style=${{width: pct+'%', backgroundColor: col}}></div>
+                  </div>
+                </div>
+              `;
+            })}
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-cream-darker">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-semibold text-bark">Heatmap Preview</h3>
+            <span className="bg-unverified/10 text-unverified text-[10px] px-2 py-1 rounded font-bold">LIVE</span>
+          </div>
+          <div className="h-40 bg-cream-darker rounded-lg relative overflow-hidden flex items-center justify-center">
+            <i className="fa-solid fa-map-location-dot text-4xl text-white opacity-50 absolute"></i>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-unverified/20 to-transparent mix-blend-multiply"></div>
+            <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-unverified/40 rounded-full blur-xl"></div>
+            <div className="absolute top-1/3 right-1/3 w-12 h-12 bg-terracotta/40 rounded-full blur-lg"></div>
+            <p className="z-10 text-xs font-bold text-bark bg-white/80 px-3 py-1.5 rounded-full backdrop-blur-sm shadow-sm">District 5 Critical Zone</p>
+          </div>
         </div>
       </div>
     `;
@@ -844,6 +1213,9 @@
     var showSuggestRef = useState(false);
     var showSuggest = showSuggestRef[0], setShowSuggest = showSuggestRef[1];
 
+    var showRequestHelpRef = useState(false);
+    var showRequestHelp = showRequestHelpRef[0], setShowRequestHelp = showRequestHelpRef[1];
+
     var showDonationRef = useState(false);
     var showDonation = showDonationRef[0], setShowDonation = showDonationRef[1];
 
@@ -876,10 +1248,14 @@
 
     var tabs = [
       { key:'home', label:'Home', icon:'fa-house' },
-      { key:'map', label:'Live Map', icon:'fa-map-location-dot' },
+      { key:'map', label:'Map', icon:'fa-map-location-dot' },
+      { key:'volunteer', label:'Volunteer', icon:'fa-hands-holding-child' },
       { key:'resources', label:'Resources', icon:'fa-building' },
       { key:'briefs', label:'Briefs', icon:'fa-clipboard-list' },
     ];
+    if (user.role === 'admin') {
+      tabs.push({ key:'analytics', label:'Analytics', icon:'fa-chart-pie' });
+    }
 
     var pendingCount = updates.filter(function(u){ return !u.is_verified; }).length;
 
@@ -903,10 +1279,12 @@
 
         <!-- Tab content -->
         <main className="flex-1 overflow-y-auto tab-content" style=${{paddingTop:'16px'}}>
-          ${tab==='home' && html`<${HomeView} user=${user} updates=${updates} resources=${MOCK_RESOURCES} onSuggest=${function(){ setShowSuggest(true); }} onDonate=${function(){ setShowDonation(true); }} setTab=${setTab} />`}
+          ${tab==='home' && html`<${HomeView} user=${user} updates=${updates} resources=${MOCK_RESOURCES} onSuggest=${function(){ setShowSuggest(true); }} onRequestHelp=${function(){ setShowRequestHelp(true); }} onDonate=${function(){ setShowDonation(true); }} setTab=${setTab} />`}
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
+          ${tab==='volunteer' && html`<${VolunteerView} updates=${updates} user=${user} />`}
           ${tab==='resources' && html`<${ResourcesView} resources=${MOCK_RESOURCES} user=${user} />`}
           ${tab==='briefs' && html`<${BriefsView} user=${user} updates=${updates} onVerify=${handleVerify} onReject=${handleReject} onSuggest=${function(){ setShowSuggest(true); }} />`}
+          ${tab==='analytics' && html`<${AnalyticsView} user=${user} updates=${updates} />`}
         </main>
 
         <!-- Bottom navigation -->
@@ -948,6 +1326,7 @@
         <!-- Modals -->
         ${showSOS ? html`<${SOSPanel} onClose=${function(){ setShowSOS(false); }} />` : null}
         ${showSuggest ? html`<${SuggestModal} user=${user} onClose=${function(){ setShowSuggest(false); }} onSubmit=${handleSuggest} />` : null}
+        ${showRequestHelp ? html`<${RequestHelpModal} onClose=${function(){ setShowRequestHelp(false); }} />` : null}
         ${showDonation ? html`<${DonationModal} onClose=${function(){ setShowDonation(false); }} />` : null}
 
         <!-- Toasts -->
@@ -957,64 +1336,85 @@
   }
 
   // =========================================================
-  // PWA MANIFEST & SERVICE WORKER
+  // PWA MANIFEST & SERVICE WORKER & OFFLINE SYNC
   // =========================================================
-  (function setupPWA() {
-    // Create manifest
-    var iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#D27D56"/><text x="96" y="132" font-family="Georgia,serif" font-size="120" font-weight="bold" fill="white" text-anchor="middle">M</text></svg>';
-    var iconDataUri = 'data:image/svg+xml;base64,' + btoa(iconSvg);
-    var manifest = {
-      name: 'Mdaad Now',
-      short_name: 'Mdaad',
-      description: 'Humanitarian coordination for low-bandwidth environments',
-      start_url: '.',
-      display: 'standalone',
-      background_color: '#FFF8F0',
-      theme_color: '#D27D56',
-      orientation: 'portrait',
-      icons: [{ src: iconDataUri, sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }],
-    };
-    var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    var link = document.querySelector('link[rel="manifest"]');
-    if (link) link.href = URL.createObjectURL(blob);
+  const API_BASE = 'http://localhost:8000/api'; // Or relative '/api' if hosted together
 
-    // Apple touch icon
-    var appleLink = document.createElement('link');
-    appleLink.rel = 'apple-touch-icon';
-    appleLink.href = iconDataUri;
-    document.head.appendChild(appleLink);
-
-    // Register minimal service worker for offline shell caching
-    if ('serviceWorker' in navigator) {
-      var swCode = [
-        'var CACHE_NAME = "mdaad-now-v1";',
-        'var SHELL_URLS = [self.location.origin + self.location.pathname];',
-        'self.addEventListener("install", function(e) {',
-        '  e.waitUntil(caches.open(CACHE_NAME).then(function(c) { return c.addAll(SHELL_URLS); }));',
-        '  self.skipWaiting();',
-        '});',
-        'self.addEventListener("activate", function(e) {',
-        '  e.waitUntil(caches.keys().then(function(keys) {',
-        '    return Promise.all(keys.filter(function(k){return k!==CACHE_NAME;}).map(function(k){return caches.delete(k);}));',
-        '  }));',
-        '  self.clients.claim();',
-        '});',
-        'self.addEventListener("fetch", function(e) {',
-        '  e.respondWith(',
-        '    caches.match(e.request).then(function(r) { return r || fetch(e.request).then(function(resp) {',
-        '      if(resp.ok && resp.type==="basic"){var c=resp.clone();caches.open(CACHE_NAME).then(function(cache){cache.put(e.request,c);});}',
-        '      return resp;',
-        '    }).catch(function(){return new Response("Offline",{status:503});});',
-        '  ));',
-        '});',
-      ].join('\n');
-      var swBlob = new Blob([swCode], { type: 'application/javascript' });
-      var swUrl = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swUrl, { scope: './' }).catch(function() {
-        // Service worker registration may fail with blob URLs in some browsers — graceful fallback
+  // Register real service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').catch(err => {
+        console.error('ServiceWorker registration failed: ', err);
       });
+    });
+  }
+
+  // Offline API Fetch wrapper
+  async function apiFetch(endpoint, options = {}) {
+    if (navigator.onLine) {
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
+        return await response.json();
+      } catch (err) {
+        console.warn('Network error, queueing offline request', err);
+        return queueOfflineRequest(endpoint, options);
+      }
+    } else {
+      console.log('Offline, queueing request');
+      return queueOfflineRequest(endpoint, options);
     }
-  })();
+  }
+
+  async function queueOfflineRequest(endpoint, options) {
+    const queue = await localforage.getItem('offlineQueue') || [];
+    const request = {
+      id: Date.now().toString(),
+      endpoint,
+      options,
+      timestamp: Date.now()
+    };
+    queue.push(request);
+    await localforage.setItem('offlineQueue', queue);
+    showToast('Saved offline. Will sync when connected.', 'info');
+    
+    // Attempt to trigger background sync if supported
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then(swRegistration => {
+        return swRegistration.sync.register('sync-offline-requests');
+      }).catch(() => {
+        // Fallback for browsers lacking Background Sync API
+        window.addEventListener('online', processOfflineQueue, { once: true });
+      });
+    } else {
+      window.addEventListener('online', processOfflineQueue, { once: true });
+    }
+    
+    return { queued: true, id: request.id };
+  }
+
+  async function processOfflineQueue() {
+    const queue = await localforage.getItem('offlineQueue') || [];
+    if (queue.length === 0) return;
+    
+    console.log('Processing offline queue', queue.length);
+    let successCount = 0;
+    const remainingQueue = [];
+    
+    for (const req of queue) {
+      try {
+        await fetch(`${API_BASE}${req.endpoint}`, req.options);
+        successCount++;
+      } catch (err) {
+        console.error('Failed to sync queued request', err);
+        remainingQueue.push(req);
+      }
+    }
+    
+    await localforage.setItem('offlineQueue', remainingQueue);
+    if (successCount > 0) showToast(`Synced ${successCount} offline updates`, 'success');
+  }
+
+  window.addEventListener('online', processOfflineQueue);
 
   // =========================================================
   // RENDER
