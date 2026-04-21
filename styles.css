@@ -5,7 +5,7 @@
       --cream-dark: #F0E4D7;
       --bark: #2D1B0E;
       --bark-light: #6B5344;
-      --verified: #2D7A3A;
+      --verified: #10B981;
       --pending: #C4960C;
       --unverified: #B83B2E;
       --border: #E2D1BF;
@@ -19,11 +19,12 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius:4px; }
 
     /* SOS pulse */
-    @keyframes sosPulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(184,59,46,0.5); }
-      50% { box-shadow: 0 0 0 12px rgba(184,59,46,0); }
+    @keyframes sosRadarPulse {
+      0% { box-shadow: 0 0 0 0 rgba(184,59,46,0.6); }
+      70% { box-shadow: 0 0 0 25px rgba(184,59,46,0); }
+      100% { box-shadow: 0 0 0 0 rgba(184,59,46,0); }
     }
-    .sos-pulse { animation: sosPulse 2s ease-in-out infinite; }
+    .sos-radar-pulse { animation: sosRadarPulse 2s ease-out infinite; }
 
     /* Fade in */
     @keyframes fadeUp {
@@ -57,6 +58,15 @@
     .bg-pattern {
       background-image: radial-gradient(circle at 1px 1px, rgba(45,27,14,0.03) 1px, transparent 0);
       background-size: 24px 24px;
+    }
+
+    /* Map grid overlay */
+    .bg-grid {
+      background-color: var(--cream);
+      background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
     /* Tab transition */

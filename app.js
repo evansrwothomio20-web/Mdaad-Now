@@ -451,26 +451,27 @@
     var u = props.update;
     var col = CATEGORY_COLORS[u.category] || '#6B5344';
     return html`
-      <div className="bg-white rounded-xl border border-cream-darker p-4 fade-up">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style=${{backgroundColor:col+'15'}}>
-              <i className=${'fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + ' text-sm'} style=${{color:col}}></i>
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] p-4 fade-up overflow-hidden relative">
+        <i className=${'fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + ' absolute -right-4 -bottom-4 text-8xl opacity-10'} style=${{color:col}}></i>
+        <div className="flex items-start justify-between gap-3 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm" style=${{backgroundColor:col}}>
+              <i className=${'fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + ' text-xl text-white'}></i>
             </div>
             <div>
-              <span className="text-xs font-bold uppercase tracking-wide" style=${{color:col}}>${u.category}</span>
-              ${u.location_coords ? html`<div className="text-[11px] text-bark-lighter mt-0.5"><i className="fa-solid fa-location-dot mr-1"></i>${u.reporter_role === 'user' ? 'User reported' : 'Field report'}</div>` : null}
+              <span className="text-xs font-black uppercase tracking-wider" style=${{color:col}}>${u.category}</span>
+              ${u.location_coords ? html`<div className="text-[11px] text-bark-lighter font-medium mt-0.5"><i className="fa-solid fa-location-dot mr-1"></i>${u.reporter_role === 'user' ? 'User reported' : 'Field report'}</div>` : null}
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             ${u.is_verified
-              ? html`<span className="verified-shimmer text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"><i className="fa-solid fa-check mr-1"></i>Verified</span>`
-              : html`<span className="bg-cream-dark text-bark-lighter text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"><i className="fa-solid fa-clock mr-1"></i>Pending</span>`
+              ? html`<span className="bg-[#10B981]/10 border border-[#10B981]/20 text-[#10B981] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm"><i className="fa-solid fa-check mr-1"></i>Verified</span>`
+              : html`<span className="bg-cream-dark border border-cream-darker text-bark-lighter text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"><i className="fa-solid fa-clock mr-1"></i>Pending</span>`
             }
           </div>
         </div>
-        <p className="text-sm text-bark mt-3 leading-relaxed">${u.description}</p>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-cream-dark">
+        <p className="text-[15px] font-medium text-bark mt-3 leading-relaxed relative z-10">${u.description}</p>
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-cream-dark relative z-10">
           <span className="text-[11px] text-bark-lighter">By ${u.reported_by}</span>
           <span className="text-[11px] text-bark-lighter">${timeAgo(u.created_at)}</span>
         </div>
@@ -706,16 +707,18 @@
         <div className="fade-up fade-up-delay-2 flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2 flex-1">
             <button onClick=${props.onRequestHelp}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
-              style=${{backgroundColor:'var(--bark)'}}
+              className="flex-1 flex flex-col items-center justify-center gap-1.5 py-4 rounded-xl text-white text-sm font-black transition-all active:scale-[0.97] shadow-lg border-[1.5px] border-white/50"
+              style=${{background:'linear-gradient(135deg, #C41E3A, #CC5500)'}}
             >
-              <i className="fa-solid fa-hand-holding-hand"></i> Request Help
+              <i className="fa-solid fa-hand-holding-hand text-xl"></i> 
+              <span className="uppercase tracking-wide">Request Help</span>
             </button>
             <button onClick=${props.onSuggest}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all active:scale-[0.97]"
-              style=${{backgroundColor:'var(--terracotta)'}}
+              className="flex-1 flex flex-col items-center justify-center gap-1.5 py-4 rounded-xl text-white text-sm font-black transition-all active:scale-[0.97] shadow-lg border-[1.5px] border-white/20"
+              style=${{background:'linear-gradient(135deg, #0047AB, #008080)'}}
             >
-              <i className="fa-solid fa-plus"></i> Report Update
+              <i className="fa-solid fa-plus text-xl"></i>
+              <span className="uppercase tracking-wide">Report Update</span>
             </button>
           </div>
           <div className="flex gap-2 flex-1 sm:flex-none">
@@ -1260,7 +1263,7 @@
     var pendingCount = updates.filter(function(u){ return !u.is_verified; }).length;
 
     return html`
-      <div className="min-h-screen flex flex-col" style=${{maxWidth:'100%',margin:'0 auto',background:'var(--cream)'}}>
+      <div className="min-h-screen flex flex-col bg-grid" style=${{maxWidth:'100%',margin:'0 auto'}}>
         <!-- Header -->
         <header className="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-cream-darker">
           <div className="px-4 py-3 flex items-center justify-between">
@@ -1313,14 +1316,22 @@
           </div>
         </nav>
 
-        <!-- SOS Floating Button -->
+        <!-- SOS Floating Action Button -->
         <button
           onClick=${function(){ setShowSOS(true); }}
-          className="sos-pulse fixed z-50 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl active:scale-90 transition-transform"
-          style=${{backgroundColor:'var(--unverified)', bottom:'calc(80px + env(safe-area-inset-bottom, 0px))', right:'16px'}}
+          className="sos-radar-pulse fixed z-50 rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_30px_rgb(184,59,46,0.6)] active:scale-95 transition-transform"
+          style=${{
+            width: '84px',
+            height: '84px',
+            backgroundColor: 'var(--unverified)',
+            bottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+            right: '24px',
+            background: 'linear-gradient(135deg, #FF4B3A, #B83B2E)'
+          }}
           aria-label="Emergency SOS contacts"
         >
-          <span className="font-bold text-sm tracking-wider">SOS</span>
+          <span className="font-black text-2xl tracking-wider leading-none">SOS</span>
+          <span className="text-[9px] font-bold uppercase tracking-wider mt-1 opacity-90 text-center leading-tight">Emergency<br/>Dispatch</span>
         </button>
 
         <!-- Modals -->
