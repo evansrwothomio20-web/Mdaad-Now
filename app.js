@@ -91,59 +91,6 @@
   ];
 
   // =========================================================
-  // APP STATE (MOCKED -> REAL DATA SYNC)
-  // =========================================================
-  const [resources, setResources] = React.useState([]);
-  const [updates, setUpdates] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  // NGO Org profile (demo — replace with Supabase auth user's org)
-  const MOCK_NGO_ORG = {
-    id:'org-001', name:'Hope Beyond Borders', category:'ngo',
-    description:'Food distribution and NFI provisioning. Running a daily kitchen serving 800 meals across 5 districts.',
-    phone:'+905559876543', whatsapp:'+905559876543', address:'Sector C, Aid Coordination Office',
-    verification_status:'verified', trust_score:78,
-    docs_submitted:true, un_ocha_registered:true, has_field_contact:true,
-    community_reports:3, campaigns_fulfilled:4, days_active:45,
-    verified_at:'2024-01-10T09:00:00Z',
-  };
-
-  // ── Sync Data from Backend ──────────────────────────────
-  React.useEffect(() => {
-    async function initData() {
-      try {
-        const [resData, reqData] = await Promise.all([
-          apiFetch('/resources'),
-          apiFetch('/requests')
-        ]);
-        
-        // Transform backend requests into the frontend "updates" format
-        const feedUpdates = (reqData || []).map(r => ({
-          id: 'req-' + r.id,
-          created_at: r.created_at || new Date().toISOString(),
-          description: r.description,
-          category: r.needs_category,
-          district: r.district,
-          urgency: r.urgency_level,
-          status: r.status,
-          is_verified: true, // Backend requests are typically verified/official
-          reported_by: r.reported_by || 'System',
-          reporter_role: 'verified_org'
-        }));
-
-        setResources(resData || []);
-        setUpdates(feedUpdates);
-      } catch (err) {
-        console.error('Failed to fetch initial data', err);
-        showToast('Running in offline/cache mode', 'info');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    initData();
-  }, []);
-
-  // =========================================================
   // UTILITIES
   // =========================================================
   function timeAgo(isoStr) {
@@ -1117,69 +1064,6 @@
     `;
   }
 
-  // =========================================================
-  // VOLUNTEER VIEW
-  // =========================================================
-  function VolunteerView(props) {
-    const opportunities = props.updates.filter(u => !u.is_verified || u.category === 'Health' || u.category === 'Food');
-    
-    return html`
-      <div className="px-4 pb-6 space-y-6">
-        <div className="fade-up pt-4">
-          <h1 className="text-3xl font-bold text-navy">Volunteer</h1>
-          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">Join the response effort / انضم إلى جهود الاستجابة</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-tealAccent to-navy p-6 rounded-premium text-white shadow-xl shadow-tealAccent/20 fade-up fade-up-delay-1">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-2xl">
-              <i className="fa-solid fa-hands-helping"></i>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg leading-tight">Ready to Help?</h3>
-              <p className="text-xs text-white/70 font-kufi">كن جزءاً من الحل اليوم</p>
-            </div>
-          </div>
-          <p className="text-sm leading-relaxed mb-4 text-white/90">We are looking for field volunteers, logistics coordinators, and medical professionals to support the ongoing efforts.</p>
-          <button className="w-full py-3 bg-white text-navy font-bold rounded-xl active:scale-[0.98] transition-all">
-            REGISTER AS VOLUNTEER
-          </button>
-        </div>
-
-        <div className="fade-up fade-up-delay-2">
-          <h2 className="text-sm font-black text-navy uppercase tracking-widest mb-4 flex items-center justify-between">
-            <span>Open Opportunities</span>
-            <span className="text-[10px] font-kufi text-slate-400">الفرص المتاحة</span>
-          </h2>
-          <div className="space-y-4">
-            ${opportunities.map((o, idx) => html`
-              <div key=${o.id} className="bg-white p-5 rounded-premium border border-slate-100 shadow-premium flex gap-4 fade-up" style=${{animationDelay: (0.3 + idx * 0.1) + 's'}}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style=${{backgroundColor: CATEGORY_COLORS[o.category] + '15', color: CATEGORY_COLORS[o.category]}}>
-                  <i className=${'fa-solid ' + CATEGORY_ICONS[o.category] + ' text-xl'}></i>
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-bold text-navy text-sm">${o.title || (o.category + ' Assistance')}</h3>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-400 uppercase tracking-wider">Field</span>
-                  </div>
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-3">${o.description}</p>
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-navy">${o.category}</span>
-                      <span className="text-[9px] font-kufi text-slate-400">${ARABIC_LABELS[o.category]}</span>
-                    </div>
-                    <button className="text-[10px] font-black text-tealAccent uppercase tracking-widest flex items-center gap-1.5 group">
-                      APPLY NOW <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `)}
-          </div>
-        </div>
-      </div>
-    `;
-  }
 
   // =========================================================
   // ANALYTICS VIEW
@@ -1227,8 +1111,8 @@
             <span className="text-[10px] font-kufi text-slate-400">توزيع الاحتياجات</span>
           </h3>
           <div className="space-y-5">
-            ${categories.map(cat => {
-              const count = props.updates.filter(u => u.category === cat).length;
+            ${['Food', 'Health', 'Safety', 'Shelter'].map(function(cat) {
+              const count = (props.updates || []).filter(u => u.category === cat).length;
               const pct = totalReq ? Math.round((count / totalReq) * 100) : 0;
               const col = CATEGORY_COLORS[cat];
               return html`
@@ -1879,11 +1763,11 @@
   // NGO DASHBOARD VIEW
   // =========================================================
   function NGODashboardView({ org, campaigns, onPostNeed, onFulfill }) {
-    const score = calculateTrustScore(org);
-    const isVerified = org.verification_status === 'verified';
-    const active = campaigns.filter(function(c){ return c.status === 'active'; });
-    const fulfilled = campaigns.filter(function(c){ return c.status === 'fulfilled'; });
-    const totalReached = campaigns.reduce(function(acc, c){ return acc + (c.quantity_fulfilled||0); }, 0);
+    const score = calculateTrustScore(org || {});
+    const isVerified = org?.verification_status === 'verified';
+    const active = (campaigns || []).filter(function(c){ return c.status === 'active'; });
+    const fulfilled = (campaigns || []).filter(function(c){ return c.status === 'fulfilled'; });
+    const totalReached = (campaigns || []).reduce(function(acc, c){ return acc + (c.quantity_fulfilled||0); }, 0);
 
     return html`
       <div className="px-4 pb-6 space-y-6 fade-in">
@@ -1893,11 +1777,11 @@
           <div className="flex items-start gap-5">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-2xl font-black shadow-lg shadow-actionOrange/20"
               style=${{ background:'linear-gradient(135deg, var(--action-orange), #fbbf24)' }}>
-              ${org.name.charAt(0)}
+              ${(org?.name || 'N').charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-xl font-bold text-navy leading-tight">${org.name}</h1>
+                <h1 className="text-xl font-bold text-navy leading-tight">${org?.name || 'NGO Profile'}</h1>
                 ${isVerified ? html`
                   <span className="text-[9px] font-black text-tealAccent bg-tealAccent/10 px-2.5 py-1 rounded-lg flex items-center gap-1.5 uppercase tracking-widest">
                     <i className="fa-solid fa-circle-check"></i> Verified NGO
@@ -1908,10 +1792,10 @@
                   </span>
                 `}
               </div>
-              <p className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-wider">${org.address}</p>
+              <p className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-wider">${org?.address || 'Address not listed'}</p>
             </div>
           </div>
-          <p className="text-sm text-slate-500 leading-relaxed mt-4">${org.description}</p>
+          <p className="text-sm text-slate-500 leading-relaxed mt-4">${org?.description || 'No description available.'}</p>
 
           <!-- Impact stats row -->
           <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-50">
@@ -1959,7 +1843,7 @@
             </div>
           </div>
           <div className="space-y-4">
-            ${campaigns.length === 0 ? html`
+            ${(campaigns || []).length === 0 ? html`
               <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <i className="fa-solid fa-clipboard-list text-3xl text-slate-200"></i>
@@ -1989,8 +1873,61 @@
     var userRef = useState({ name:'Civilian', role:'user' });
     var user = userRef[0], setUser = userRef[1];
 
-    var updatesRef = React.useState([]);
-    var updates = updatesRef[0], setUpdates = updatesRef[1];
+    var [resources, setResources] = React.useState([]);
+    var [updates, setUpdates] = React.useState([]);
+    var [isLoading, setIsLoading] = React.useState(true);
+
+    var [showPostNeed, setShowPostNeed] = React.useState(false);
+
+    // NGO Org profile (demo — replace with Supabase auth user's org)
+    const MOCK_NGO_ORG = {
+      id:'org-001', name:'Hope Beyond Borders', category:'ngo',
+      description:'Food distribution and NFI provisioning. Running a daily kitchen serving 800 meals across 5 districts.',
+      phone:'+905559876543', whatsapp:'+905559876543', address:'Sector C, Aid Coordination Office',
+      verification_status:'verified', trust_score:78,
+      docs_submitted:true, un_ocha_registered:true, has_field_contact:true,
+      community_reports:3, campaigns_fulfilled:4, days_active:45,
+      verified_at:'2024-01-10T09:00:00Z',
+    };
+
+    // ── Sync Data from Backend ──────────────────────────────
+    React.useEffect(() => {
+      async function initData() {
+        try {
+          const [resData, reqData] = await Promise.all([
+            apiFetch('/resources'),
+            apiFetch('/requests')
+          ]);
+          
+          // Handle cases where data might be a queued object or null
+          const safeReqData = Array.isArray(reqData) ? reqData : [];
+          const safeResData = Array.isArray(resData) ? resData : [];
+
+          // Transform backend requests into the frontend "updates" format
+          const feedUpdates = safeReqData.map(r => ({
+            id: 'req-' + r.id,
+            created_at: r.created_at || new Date().toISOString(),
+            description: r.description,
+            category: r.needs_category,
+            district: r.district,
+            urgency: r.urgency_level,
+            status: r.status,
+            is_verified: true, // Backend requests are typically verified/official
+            reported_by: r.reported_by || 'System',
+            reporter_role: 'verified_org'
+          }));
+
+          setResources(safeResData);
+          setUpdates(feedUpdates);
+        } catch (err) {
+          console.error('Failed to fetch initial data', err);
+          showToast('Running in offline/cache mode', 'info');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      initData();
+    }, []);
 
     var showSOSRef = useState(false);
     var showSOS = showSOSRef[0], setShowSOS = showSOSRef[1];
@@ -2019,8 +1956,10 @@
             setOrg(orgData);
             
             // Fetch real campaigns from the backend
-            const camps = await apiFetch('/campaigns');
-            setOrgCampaigns(camps.map(c => ({
+            const campsData = await apiFetch('/campaigns');
+            const safeCampsData = Array.isArray(campsData) ? campsData : [];
+            
+            setOrgCampaigns(safeCampsData.map(c => ({
               id: 'c-' + c.id,
               title: c.title,
               category: c.category,
