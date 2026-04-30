@@ -197,12 +197,16 @@
     return html`
       <div className="fixed top-4 left-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none" style=${{maxWidth:'100%',margin:'0 auto'}}>
         ${toasts.map(function(t) {
-          var bg = t.type==='success' ? 'bg-verified' : t.type==='error' ? 'bg-unverified' : 'bg-pending';
+          var bg = t.type==='success' ? 'bg-tealAccent' : t.type==='error' ? 'bg-red-500' : 'bg-navy';
           var icon = t.type==='success' ? 'fa-circle-check' : t.type==='error' ? 'fa-circle-xmark' : 'fa-circle-info';
           return html`
-            <div key=${t.id} className=${(t.removing?'toast-out':'toast-in') + ' pointer-events-auto flex items-center gap-3 ' + bg + ' text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium'}>
-              <i className=${'fa-solid ' + icon}></i>
-              <span>${t.message}</span>
+            <div key=${t.id} className=${(t.removing?'toast-out':'toast-in') + ' pointer-events-auto flex items-center justify-between gap-3 ' + bg + ' text-white px-5 py-4 rounded-premium shadow-premium text-sm font-bold'}>
+              <div className="flex items-center gap-3">
+                <i className=${'fa-solid ' + icon}></i>
+                <div className="flex flex-col">
+                  <span>${t.message}</span>
+                </div>
+              </div>
             </div>
           `;
         })}
@@ -216,29 +220,31 @@
   function SOSPanel(props) {
     return html`
       <div className="fixed inset-0 z-[90] flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="Emergency contacts">
-        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
-        <div className="slide-up relative bg-cream rounded-t-3xl max-h-[80vh] overflow-y-auto bottom-safe" style=${{maxWidth:'100%',margin:'0 auto',width:'100%'}}>
-          <div className="sticky top-0 bg-cream pt-4 pb-2 px-6 flex items-center justify-between z-10">
+        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-white rounded-t-[32px] max-h-[85vh] overflow-y-auto bottom-safe shadow-2xl">
+          <div className="sticky top-0 bg-white/80 backdrop-blur-md pt-6 pb-4 px-8 flex items-center justify-between z-10 border-b border-slate-50">
             <div>
-              <h2 className="text-xl text-bark">Emergency Contacts</h2>
-              <p className="text-xs text-bark-lighter mt-0.5">Available offline — no internet needed</p>
+              <h2 className="text-2xl font-bold text-navy">Emergency Contacts</h2>
+              <p className="text-[11px] font-kufi text-slate-400 mt-1">جهات اتصال الطوارئ — تعمل بدون إنترنت</p>
             </div>
-            <button onClick=${props.onClose} className="w-10 h-10 rounded-full bg-cream-dark flex items-center justify-center text-bark-light hover:text-bark" aria-label="Close">
+            <button onClick=${props.onClose} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-navy transition-colors">
               <i className="fa-solid fa-xmark text-lg"></i>
             </button>
           </div>
-          <div className="px-6 pb-8 space-y-2">
+          <div className="p-6 space-y-3">
             ${EMERGENCY_NUMBERS.map(function(e) {
               return html`
-                <a key=${e.number} href=${'tel:'+e.number} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-cream-darker hover:border-terracotta/30 transition-colors active:bg-cream-dark">
-                  <div className="w-11 h-11 rounded-full bg-unverified/10 flex items-center justify-center flex-shrink-0">
-                    <i className=${'fa-solid ' + e.icon + ' text-unverified'}></i>
+                <a key=${e.number} href=${'tel:'+e.number} className="flex items-center gap-4 p-5 bg-white rounded-premium border border-slate-50 shadow-premium hover:border-red-100 transition-all active:scale-[0.98]">
+                  <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                    <i className=${'fa-solid ' + e.icon + ' text-red-500 text-xl'}></i>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-bark text-sm">${e.name}</div>
-                    <div className="text-bark-lighter text-xs mt-0.5">${e.number}</div>
+                    <div className="font-bold text-navy text-base leading-none">${e.name}</div>
+                    <div className="text-slate-400 text-xs mt-1.5 font-medium tracking-tight">${e.number}</div>
                   </div>
-                  <i className="fa-solid fa-phone text-terracotta text-sm"></i>
+                  <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+                    <i className="fa-solid fa-phone text-sm"></i>
+                  </div>
                 </a>
               `;
             })}
@@ -253,26 +259,36 @@
   // =========================================================
   function PizzaTracker(props) {
     const statuses = ['Pending', 'Dispatched', 'Fulfilled'];
+    const arabicStatuses = ['قيد الانتظار', 'تم الإرسال', 'تم الإنجاز'];
     const currentIndex = statuses.indexOf(props.status) !== -1 ? statuses.indexOf(props.status) : 0;
     
     return html`
-      <div className="w-full mt-4 bg-white p-4 rounded-xl border border-cream-darker">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-semibold text-bark">Request Status</span>
-          <span className="text-xs font-bold text-terracotta uppercase">${props.status}</span>
+      <div className="w-full mt-6 bg-slate-50 p-6 rounded-premium border border-slate-100">
+        <div className="flex justify-between items-end mb-6">
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-navy uppercase tracking-wider">Request Status</span>
+            <span className="text-[10px] font-kufi text-slate-400">حالة الطلب</span>
+          </div>
+          <div className="text-right flex flex-col items-end">
+            <span className="text-sm font-black text-tealAccent uppercase">${props.status}</span>
+            <span className="text-[10px] font-kufi text-tealAccent/70">${arabicStatuses[currentIndex]}</span>
+          </div>
         </div>
-        <div className="flex items-center w-full relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-cream-dark rounded-full"></div>
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-terracotta rounded-full transition-all duration-500" style=${{width: (currentIndex / (statuses.length - 1)) * 100 + '%'}}></div>
+        <div className="flex items-center w-full relative px-2">
+          <div className="absolute left-0 right-0 top-[11px] h-1.5 bg-slate-200 rounded-full mx-6"></div>
+          <div className="absolute left-0 top-[11px] h-1.5 bg-tealAccent rounded-full transition-all duration-700 ease-out mx-6" style=${{width: `calc(${(currentIndex / (statuses.length - 1)) * 100}% - 4px)`}}></div>
           
           ${statuses.map((s, i) => {
             const isActive = i <= currentIndex;
             return html`
               <div key=${s} className="relative z-10 flex flex-col items-center flex-1">
-                <div className=${'w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-500 ' + (isActive ? 'bg-terracotta border-terracotta text-white' : 'bg-white border-cream-darker text-bark-lighter')}>
-                  ${isActive ? html`<i className="fa-solid fa-check text-[10px]"></i>` : html`<div className="w-2 h-2 rounded-full bg-cream-darker"></div>`}
+                <div className=${'w-6 h-6 rounded-full flex items-center justify-center border-[3px] transition-all duration-500 shadow-sm ' + (isActive ? 'bg-tealAccent border-white text-white' : 'bg-white border-slate-200 text-slate-300')}>
+                  ${isActive ? html`<i className="fa-solid fa-check text-[10px]"></i>` : html`<div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div>`}
                 </div>
-                <span className=${'text-[10px] mt-1.5 font-bold uppercase tracking-wider transition-colors ' + (isActive ? 'text-bark' : 'text-bark-lighter')}>${s}</span>
+                <div className="flex flex-col items-center mt-3">
+                  <span className=${'text-[9px] font-black uppercase tracking-tight ' + (isActive ? 'text-navy' : 'text-slate-400')}>${s}</span>
+                  <span className=${'text-[8px] font-kufi mt-0.5 ' + (isActive ? 'text-navy/60' : 'text-slate-300')}>${arabicStatuses[i]}</span>
+                </div>
               </div>
             `;
           })}
@@ -303,17 +319,19 @@
     if (submittedReq) {
       return html`
         <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
-          <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6 bottom-safe">
+          <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
+          <div className="slide-up relative bg-white rounded-t-[32px] sm:rounded-premium w-full max-w-md p-8 bottom-safe shadow-2xl">
             <div className="text-center">
-              <div className="w-16 h-16 bg-verified/20 rounded-full flex items-center justify-center mx-auto mb-4 text-verified text-2xl">
-                <i className="fa-solid fa-check-circle"></i>
+              <div className="w-20 h-20 bg-tealAccent/10 rounded-full flex items-center justify-center mx-auto mb-6 text-tealAccent text-3xl shadow-inner">
+                <i className="fa-solid fa-circle-check"></i>
               </div>
-              <h2 className="text-xl font-bold text-bark mb-1">Help is on the way</h2>
-              <p className="text-sm text-bark-lighter mb-4">Your request has been logged in the system.</p>
+              <h2 className="text-2xl font-bold text-navy mb-1">Help is on the way</h2>
+              <p className="text-[11px] font-kufi text-slate-400">طلبك مسجل في النظام — المساعدة في طريقها إليك</p>
             </div>
             <${PizzaTracker} status=${submittedReq.status} />
-            <button onClick=${props.onClose} className="w-full mt-6 py-3 rounded-xl bg-terracotta text-white font-semibold text-sm">Close</button>
+            <button onClick=${props.onClose} className="w-full mt-8 py-4 rounded-premium bg-navy text-white font-bold text-sm shadow-lg shadow-navy/20 active:scale-[0.98] transition-all">
+              DISMISS / إغلاق
+            </button>
           </div>
         </div>
       `;
@@ -321,57 +339,77 @@
 
     return html`
       <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
-        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
-        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full max-w-md bottom-safe overflow-y-auto max-h-[90vh]">
-          <div className="sticky top-0 bg-cream pt-5 pb-3 px-6 flex items-center justify-between border-b border-cream-darker z-10">
-            <h2 className="text-lg text-bark">Request Help</h2>
-            <button type="button" onClick=${props.onClose} className="w-9 h-9 rounded-full bg-cream-dark flex items-center justify-center text-bark-light"><i className="fa-solid fa-xmark"></i></button>
+        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-white rounded-t-[32px] sm:rounded-premium w-full max-w-md bottom-safe overflow-y-auto max-h-[90vh] shadow-2xl">
+          <div className="sticky top-0 bg-white/80 backdrop-blur-md pt-6 pb-4 px-8 flex items-center justify-between border-b border-slate-50 z-10">
+            <div>
+              <h2 className="text-xl font-bold text-navy uppercase tracking-tight">Request Help</h2>
+              <p className="text-[10px] font-kufi text-slate-400 mt-0.5">طلب المساعدة والموارد</p>
+            </div>
+            <button type="button" onClick=${props.onClose} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-navy transition-colors">
+              <i className="fa-solid fa-xmark"></i>
+            </button>
           </div>
-          <form onSubmit=${handleSubmit} className="p-6 space-y-4">
+          <form onSubmit=${handleSubmit} className="p-8 space-y-6">
             ${step === 1 ? html`
-              <div className="space-y-4 fade-in">
+              <div className="space-y-6 fade-in">
                 <div>
-                  <label className="block text-sm font-semibold text-bark mb-2">What do you need?</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="flex justify-between items-end mb-3">
+                    <span className="text-xs font-bold text-navy uppercase tracking-wider">What do you need?</span>
+                    <span className="text-[9px] font-kufi text-slate-400">ما هي حاجتك؟</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
                     ${CATEGORIES.map(cat => html`
                       <button key=${cat} type="button" onClick=${() => setForm(Object.assign({},form,{category:cat}))} 
-                        className=${'p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ' + (form.category===cat ? 'bg-terracotta/10 border-terracotta text-terracotta' : 'bg-white border-cream-darker text-bark-light')}>
-                        <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' text-xl'}></i>
-                        <span className="text-xs font-bold">${cat}</span>
+                        className=${'p-4 rounded-premium border-2 flex flex-col items-center gap-2 transition-all ' + (form.category===cat ? 'bg-tealAccent/5 border-tealAccent text-tealAccent shadow-sm' : 'bg-white border-slate-100 text-slate-400')}>
+                        <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' text-2xl'}></i>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">${cat}</span>
+                        <span className="text-[9px] font-kufi opacity-70">${ARABIC_LABELS[cat]}</span>
                       </button>
                     `)}
                   </div>
                 </div>
-                <button type="button" onClick=${() => setStep(2)} className="w-full py-3 rounded-xl bg-bark text-white font-semibold text-sm mt-4">Next Step <i className="fa-solid fa-arrow-right ml-1"></i></button>
+                <button type="button" onClick=${() => setStep(2)} className="w-full py-4 rounded-premium bg-navy text-white font-bold text-sm shadow-lg shadow-navy/20 active:scale-[0.98] transition-all">
+                  CONTINUE / استمرار <i className="fa-solid fa-chevron-right ml-2 text-[10px]"></i>
+                </button>
               </div>
             ` : null}
             ${step === 2 ? html`
-              <div className="space-y-4 fade-in">
+              <div className="space-y-6 fade-in">
                 <div>
-                  <label className="block text-sm font-semibold text-bark mb-1.5">District</label>
+                  <label className="flex justify-between items-end mb-2">
+                    <span className="text-xs font-bold text-navy uppercase tracking-wider">Location / District</span>
+                    <span className="text-[9px] font-kufi text-slate-400">المنطقة / الحي</span>
+                  </label>
                   <input type="text" value=${form.district} onInput=${e => setForm(Object.assign({},form,{district:e.target.value}))} required
-                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-terracotta/30 outline-none" placeholder="e.g. Sector 4, Downtown" />
+                    className="w-full rounded-premium border border-slate-100 bg-slate-50 px-5 py-4 text-sm font-medium text-navy focus:ring-2 focus:ring-tealAccent/20 focus:bg-white outline-none transition-all" placeholder="e.g. Sector 4, Downtown" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-bark mb-1.5">Urgency Level</label>
+                  <label className="flex justify-between items-end mb-2">
+                    <span className="text-xs font-bold text-navy uppercase tracking-wider">Urgency</span>
+                    <span className="text-[9px] font-kufi text-slate-400">درجة الاستعجال</span>
+                  </label>
                   <div className="flex gap-2">
                     ${['Low','Medium','Critical'].map(level => html`
                       <button key=${level} type="button" onClick=${() => setForm(Object.assign({},form,{urgency:level}))}
-                        className=${'flex-1 py-2 rounded-lg border text-xs font-semibold ' + (form.urgency===level ? (level==='Critical'?'bg-unverified border-unverified text-white':'bg-bark border-bark text-white') : 'bg-white border-cream-darker text-bark-light')}>
+                        className=${'flex-1 py-3 rounded-xl border-2 text-[10px] font-bold uppercase tracking-wider transition-all ' + (form.urgency===level ? (level==='Critical'?'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20':'bg-navy border-navy text-white shadow-lg shadow-navy/20') : 'bg-white border-slate-100 text-slate-400')}>
                         ${level}
                       </button>
                     `)}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-bark mb-1.5">Additional Details</label>
-                  <textarea value=${form.description} onInput=${e => setForm(Object.assign({},form,{description:e.target.value}))} rows="2"
-                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-sm focus:ring-2 focus:ring-terracotta/30 outline-none"></textarea>
+                  <label className="flex justify-between items-end mb-2">
+                    <span className="text-xs font-bold text-navy uppercase tracking-wider">Additional Details</span>
+                    <span className="text-[9px] font-kufi text-slate-400">تفاصيل إضافية</span>
+                  </label>
+                  <textarea value=${form.description} onInput=${e => setForm(Object.assign({},form,{description:e.target.value}))} rows="3"
+                    className="w-full rounded-premium border border-slate-100 bg-slate-50 px-5 py-4 text-sm font-medium text-navy focus:ring-2 focus:ring-tealAccent/20 focus:bg-white outline-none transition-all resize-none"></textarea>
                 </div>
-                <div className="flex gap-2 mt-4">
-                  <button type="button" onClick=${() => setStep(1)} className="w-1/3 py-3 rounded-xl bg-cream-dark text-bark font-semibold text-sm">Back</button>
-                  <button type="submit" disabled=${isSubmitting || !form.district} className="w-2/3 py-3 rounded-xl bg-terracotta text-white font-semibold text-sm disabled:opacity-50 flex justify-center items-center">
-                    ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin mr-2"></i>` : null} Submit Request
+                <div className="flex gap-3 mt-6">
+                  <button type="button" onClick=${() => setStep(1)} className="w-1/3 py-4 rounded-premium bg-slate-50 text-slate-400 font-bold text-sm hover:text-navy transition-all">BACK</button>
+                  <button type="submit" disabled=${isSubmitting || !form.district} className="w-2/3 py-4 rounded-premium bg-actionOrange text-white font-bold text-sm shadow-lg shadow-actionOrange/20 disabled:opacity-50 flex justify-center items-center active:scale-[0.98] transition-all">
+                    ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin mr-2"></i>` : null} SUBMIT / إرسال
                   </button>
                 </div>
               </div>
@@ -426,28 +464,37 @@
 
     return html`
       <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Suggest an update">
-        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
-        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full bottom-safe overflow-y-auto" style=${{maxWidth:'100%',maxHeight:'90vh'}}>
-          <div className="sticky top-0 bg-cream pt-5 pb-3 px-6 flex items-center justify-between border-b border-cream-darker">
-            <h2 className="text-lg text-bark">Suggest an Update</h2>
-            <button onClick=${props.onClose} className="w-9 h-9 rounded-full bg-cream-dark flex items-center justify-center text-bark-light" aria-label="Close">
+        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-white rounded-t-[32px] sm:rounded-premium w-full bottom-safe overflow-y-auto max-h-[90vh] shadow-2xl">
+          <div className="sticky top-0 bg-white/80 backdrop-blur-md pt-6 pb-4 px-8 flex items-center justify-between border-b border-slate-50 z-10">
+            <div>
+              <h2 className="text-xl font-bold text-navy uppercase tracking-tight">Report Update</h2>
+              <p className="text-[10px] font-kufi text-slate-400 mt-0.5">إبلاغ عن تحديث ميداني</p>
+            </div>
+            <button onClick=${props.onClose} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-navy transition-colors" aria-label="Close">
               <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
-          <form onSubmit=${handleSubmit} className="p-6 space-y-4">
+          <form onSubmit=${handleSubmit} className="p-8 space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-bark mb-1.5">What's happening?</label>
+              <label className="flex justify-between items-end mb-2">
+                <span className="text-xs font-bold text-navy uppercase tracking-wider">What's happening?</span>
+                <span className="text-[9px] font-kufi text-slate-400">ماذا يحدث الآن؟</span>
+              </label>
               <textarea
                 value=${form.description}
                 onInput=${function(e){ setForm(Object.assign({},form,{description:e.target.value})); }}
                 rows="3"
-                className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-bark text-sm placeholder:text-bark-lighter/60 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta resize-none"
+                className="w-full rounded-premium border border-slate-100 bg-slate-50 px-5 py-4 text-navy text-sm placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-navy/5 focus:bg-white transition-all resize-none font-medium"
                 placeholder="e.g. Road blocked near District 5, aid distribution at 2pm..."
                 required
               ></textarea>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-bark mb-1.5">Category</label>
+              <label className="flex justify-between items-end mb-2">
+                <span className="text-xs font-bold text-navy uppercase tracking-wider">Category</span>
+                <span className="text-[9px] font-kufi text-slate-400">التصنيف</span>
+              </label>
               <div className="flex gap-2 flex-wrap">
                 ${CATEGORIES.map(function(cat) {
                   var active = form.category === cat;
@@ -455,34 +502,40 @@
                   return html`
                     <button key=${cat} type="button"
                       onClick=${function(){ setForm(Object.assign({},form,{category:cat})); }}
-                      className=${'px-3.5 py-2 rounded-lg text-xs font-semibold border-2 transition-all ' + (active ? 'text-white' : 'bg-white text-bark-light border-cream-darker')}
-                      style=${active ? {backgroundColor:col, borderColor:col} : {}}
+                      className=${'px-4 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest border-2 transition-all ' + (active ? 'text-white shadow-lg' : 'bg-white text-slate-400 border-slate-100')}
+                      style=${active ? {backgroundColor:col, borderColor:col, shadowColor: col + '40'} : {}}
                     >
-                      <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' mr-1'}></i> ${cat}
+                      <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' mr-1.5'}></i> ${cat}
                     </button>
                   `;
                 })}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-bark mb-1.5">Location (optional)</label>
+              <label className="flex justify-between items-end mb-2">
+                <span className="text-xs font-bold text-navy uppercase tracking-wider">Location (optional)</span>
+                <span className="text-[9px] font-kufi text-slate-400">الموقع (اختياري)</span>
+              </label>
               <input
                 type="text"
                 value=${form.location}
                 onInput=${function(e){ setForm(Object.assign({},form,{location:e.target.value})); }}
-                className="w-full rounded-xl border border-cream-darker bg-white px-4 py-3 text-bark text-sm placeholder:text-bark-lighter/60 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta"
+                className="w-full rounded-premium border border-slate-100 bg-slate-50 px-5 py-4 text-navy text-sm font-medium focus:ring-2 focus:ring-navy/5 focus:bg-white transition-all"
                 placeholder="e.g. District 3, near the mosque"
               />
             </div>
-            <div className="flex items-center gap-2 p-3 bg-pending/10 rounded-xl text-xs text-bark-light">
-              <i className="fa-solid fa-circle-info text-pending"></i>
-              <span>Your update will be reviewed by a verified coordinator before appearing on the live feed.</span>
+            <div className="flex items-center gap-3 p-4 bg-navy/5 rounded-premium text-[11px] text-navy font-medium border border-navy/5">
+              <i className="fa-solid fa-circle-info text-navy/40 text-lg"></i>
+              <div>
+                <span>Your update will be reviewed by a verified coordinator.</span>
+                <p className="font-kufi opacity-60">سيتم مراجعة تحديثك من قبل منسق معتمد.</p>
+              </div>
             </div>
             <button type="submit" disabled=${isSubmitting || !form.description.trim()}
-              className="w-full py-3 rounded-xl font-semibold text-white text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style=${{backgroundColor:'var(--terracotta)'}}
+              className="w-full py-4 rounded-premium font-bold text-white text-sm transition-all shadow-lg shadow-navy/20 disabled:opacity-50 active:scale-[0.98]"
+              style=${{backgroundColor:'var(--navy)'}}
             >
-              ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin mr-2"></i>Sending...` : 'Submit Update'}
+              ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin mr-2"></i>SENDING...` : 'SUBMIT UPDATE / إرسال التحديث'}
             </button>
           </form>
         </div>
@@ -890,56 +943,66 @@
         var isConfidential = u.is_confidential;
         
         var lat = u.location_coords.lat;
-        var lng = u.location_coords.lat2;
+        var lng = u.location_coords.lng;
         var displayDesc = u.description;
         var col = CATEGORY_COLORS[u.category] || '#6B5344';
         
         var verBadge = u.is_verified
-          ? '<span style="background:var(--verified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">VERIFIED</span>'
-          : '<span style="background:#F0E4D7;color:var(--bark-lighter);font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px">PENDING</span>';
+          ? `<span style="background:var(--teal-accent);color:white;font-size:9px;font-weight:900;padding:2px 10px;border-radius:6px;letter-spacing:0.05em">VERIFIED</span>`
+          : `<span style="background:#F1F5F9;color:#94A3B8;font-size:9px;font-weight:900;padding:2px 10px;border-radius:6px;letter-spacing:0.05em">PENDING</span>`;
 
         if (isConfidential && !isAuthorized) {
-          // General area circle instead of exact marker
           lat = Math.floor(lat * 100) / 100;
           lng = Math.floor(lng * 100) / 100;
-          displayDesc = '<b style="color:var(--unverified)">Confidential Location</b><br/>General Area Only. Precise coordinates hidden for safety.';
           var circle = L.circle([lat, lng], {
             color: col,
             fillColor: col,
-            fillOpacity: 0.2,
+            fillOpacity: 0.15,
             radius: 800,
             stroke: false
           }).addTo(map);
-          circle.bindPopup(
-            '<div style="min-width:180px">' +
-              '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
-                verBadge +
-                '<span style="background:var(--unverified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px"><i class="fa-solid fa-eye-slash mr-1"></i>HIDDEN</span>' +
-              '</div>' +
-              '<p style="font-size:13px;line-height:1.5;color:var(--bark);margin:0 0 6px 0">' + displayDesc + '</p>' +
-              '<span style="font-size:11px;color:var(--bark-lighter)">' + u.category + ' · ' + timeAgo(u.created_at) + '</span>' +
-            '</div>'
-          );
+          circle.bindPopup(`
+            <div style="min-width:200px; padding:4px">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px">
+                ${verBadge}
+                <span style="background:#EF4444;color:white;font-size:9px;font-weight:900;padding:2px 10px;border-radius:6px"><i class="fa-solid fa-eye-slash"></i> MASKED</span>
+              </div>
+              <p style="font-size:14px; font-weight:600; color:var(--navy); margin:0 0 6px 0">Confidential Location</p>
+              <p style="font-size:12px; line-height:1.4; color:#64748B; margin:0 0 12px 0">Precise coordinates are hidden for security. This marks the general vicinity.</p>
+              <div style="display:flex; justify-content:between; align-items:center; border-top:1px solid #F1F5F9; padding-top:8px">
+                <span style="font-size:10px; font-weight:700; color:${col}">${u.category.toUpperCase()}</span>
+                <span style="font-size:10px; color:#94A3B8; margin-left:auto">${timeAgo(u.created_at)}</span>
+              </div>
+            </div>
+          `);
           markersRef.current.push(circle);
         } else {
           var icon = L.divIcon({
             className: '',
-            html: '<div class="map-marker" style="background:' + col + '"><i class="fa-solid ' + (CATEGORY_ICONS[u.category]||'fa-circle') + '" style="font-size:11px"></i></div>',
-            iconSize: [28,28],
-            iconAnchor: [14,14],
-            popupAnchor: [0,-16],
+            html: `<div class="map-marker shadow-lg" style="background:${col}; border:3px solid white; width:32px; height:32px; border-radius:12px 12px 0 12px; display:flex; align-items:center; justify-center; transform:rotate(45deg)">
+                    <i class="fa-solid ${(CATEGORY_ICONS[u.category]||'fa-circle')}" style="color:white; font-size:14px; transform:rotate(-45deg)"></i>
+                   </div>`,
+            iconSize: [32,32],
+            iconAnchor: [16,32],
+            popupAnchor: [0,-32],
           });
           var marker = L.marker([lat, lng], {icon:icon}).addTo(map);
-          var confBadge = isConfidential ? '<span style="background:var(--unverified);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px"><i class="fa-solid fa-lock mr-1"></i>CONFIDENTIAL</span>' : '';
-          marker.bindPopup(
-            '<div style="min-width:180px">' +
-              '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
-                verBadge + confBadge +
-              '</div>' +
-              '<p style="font-size:13px;line-height:1.5;color:var(--bark);margin:0 0 6px 0">' + displayDesc + '</p>' +
-              '<span style="font-size:11px;color:var(--bark-lighter)">' + u.category + ' · ' + timeAgo(u.created_at) + '</span>' +
-            '</div>'
-          );
+          var confBadge = isConfidential ? '<span style="background:#6366F1;color:white;font-size:9px;font-weight:900;padding:2px 10px;border-radius:6px;margin-left:4px">MASKED</span>' : '';
+          marker.bindPopup(`
+            <div style="min-width:220px; padding:4px">
+              <div style="display:flex; align-items:center; gap:4px; margin-bottom:10px">
+                ${verBadge} ${confBadge}
+              </div>
+              <p style="font-size:14px; font-weight:500; line-height:1.5; color:var(--navy); margin:0 0 12px 0">${u.description}</p>
+              <div style="display:flex; justify-content:between; align-items:center; border-top:1px solid #F1F5F9; padding-top:8px">
+                <div style="display:flex; flex-direction:column">
+                  <span style="font-size:10px; font-weight:800; color:${col}; letter-spacing:0.02em">${u.category.toUpperCase()}</span>
+                  <span style="font-size:9px; font-family:'Readex Pro'; color:#94A3B8">${ARABIC_LABELS[u.category]}</span>
+                </div>
+                <span style="font-size:10px; color:#94A3B8; margin-left:auto">${timeAgo(u.created_at)}</span>
+              </div>
+            </div>
+          `);
           markersRef.current.push(marker);
         }
       });
@@ -948,19 +1011,24 @@
     return html`
       <div className="relative" style=${{height:'calc(100vh - 130px)'}}>
         <!-- Filter chips -->
-        <div className="absolute top-3 left-3 right-3 z-[30] flex gap-2 overflow-x-auto pb-1" style=${{scrollbarWidth:'none'}}>
+        <div className="absolute top-4 left-4 right-4 z-[30] flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button onClick=${function(){ setMapFilter('all'); }}
-            className=${'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ' + (mapFilter==='all' ? 'bg-bark text-white border-bark' : 'bg-white/90 text-bark-light border-cream-darker backdrop-blur-sm')}>
-            All
+            className=${'flex-shrink-0 flex flex-col items-center justify-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all backdrop-blur-md ' + (mapFilter==='all' ? 'bg-navy border-navy text-white shadow-lg shadow-navy/20' : 'bg-white/80 text-slate-400 border-slate-100')}>
+            <span>All</span>
+            <span className="text-[8px] font-kufi opacity-60">الكل</span>
           </button>
           ${CATEGORIES.map(function(cat) {
             var active = mapFilter === cat;
             return html`
               <button key=${cat} onClick=${function(){ setMapFilter(cat); }}
-                className=${'flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ' + (active ? 'text-white border-transparent' : 'bg-white/90 text-bark-light border-cream-darker backdrop-blur-sm')}
-                style=${active ? {backgroundColor:CATEGORY_COLORS[cat], borderColor:CATEGORY_COLORS[cat]} : {}}
+                className=${'flex-shrink-0 flex flex-col items-center justify-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all backdrop-blur-md ' + (active ? 'text-white border-transparent shadow-lg' : 'bg-white/80 text-slate-400 border-slate-100')}
+                style=${active ? {backgroundColor:CATEGORY_COLORS[cat], shadowColor: CATEGORY_COLORS[cat] + '40'} : {}}
               >
-                <i className=${'fa-solid ' + CATEGORY_ICONS[cat] + ' mr-1'}></i>${cat}
+                <div className="flex items-center gap-1.5">
+                  <i className=${'fa-solid ' + CATEGORY_ICONS[cat]}></i>
+                  <span>${cat}</span>
+                </div>
+                <span className="text-[8px] font-kufi opacity-70">${ARABIC_LABELS[cat]}</span>
               </button>
             `;
           })}
@@ -988,55 +1056,126 @@
     }, [props.resources, catFilter, query]);
 
     return html`
-      <div className="px-4 pb-6 space-y-4">
-        <div className="fade-up">
-          <h1 className="text-2xl text-bark">Resources</h1>
-          <p className="text-sm text-bark-lighter mt-0.5">${filtered.length} ${filtered.length===1?'result':'results'}</p>
+      <div className="px-4 pb-6 space-y-6">
+        <div className="fade-up pt-4">
+          <h1 className="text-3xl font-bold text-navy">Resources</h1>
+          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">${filtered.length} results / ${filtered.length} نتائج</p>
         </div>
 
         <!-- Search -->
-        <div className="fade-up fade-up-delay-1 relative">
-          <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-bark-lighter text-sm"></i>
+        <div className="fade-up fade-up-delay-1 relative group">
+          <i className="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-tealAccent transition-colors"></i>
           <input
             type="search"
             value=${query}
             onInput=${function(e){ setQuery(e.target.value); }}
-            className="w-full rounded-xl border border-cream-darker bg-white pl-11 pr-4 py-3 text-sm text-bark placeholder:text-bark-lighter/50 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta"
+            className="w-full rounded-premium border border-slate-100 bg-white pl-12 pr-5 py-4 text-sm font-medium text-navy shadow-premium placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent/50 transition-all"
             placeholder="Search organizations, hospitals..."
             aria-label="Search resources"
           />
           ${query ? html`
-            <button onClick=${function(){ setQuery(''); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-cream-dark flex items-center justify-center text-bark-lighter text-xs" aria-label="Clear search">
-              <i className="fa-solid fa-xmark"></i>
+            <button onClick=${function(){ setQuery(''); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-navy transition-all" aria-label="Clear search">
+              <i className="fa-solid fa-xmark text-sm"></i>
             </button>
           ` : null}
         </div>
 
         <!-- Category filter -->
-        <div className="fade-up fade-up-delay-2 flex gap-2 overflow-x-auto" style=${{scrollbarWidth:'none'}}>
+        <div className="fade-up fade-up-delay-2 flex gap-2 overflow-x-auto no-scrollbar pb-1">
           ${RESOURCE_CATS.map(function(c) {
             var active = catFilter === c;
             return html`
               <button key=${c} onClick=${function(){ setCatFilter(c); }}
-                className=${'flex-shrink-0 px-4 py-2 rounded-lg text-xs font-semibold border transition-all ' + (active ? 'bg-bark text-white border-bark' : 'bg-white text-bark-light border-cream-darker')}
+                className=${'flex-shrink-0 flex flex-col items-center justify-center px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all ' + (active ? 'bg-navy border-navy text-white shadow-lg shadow-navy/20' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200')}
               >
-                ${c!=='all' ? html`<i className=${'fa-solid ' + RESOURCE_ICONS[c] + ' mr-1.5'}></i>` : null}${RESOURCE_LABELS[c]}
+                <div className="flex items-center gap-2">
+                  ${c!=='all' ? html`<i className=${'fa-solid ' + RESOURCE_ICONS[c]}></i>` : null}
+                  <span>${RESOURCE_LABELS[c]}</span>
+                </div>
+                <span className="text-[8px] font-kufi opacity-60 mt-0.5">${ARABIC_LABELS[c]}</span>
               </button>
             `;
           })}
         </div>
 
         <!-- Resource list -->
-        <div className="space-y-3 fade-up fade-up-delay-3">
+        <div className="space-y-4 fade-up fade-up-delay-3">
           ${filtered.map(function(r) {
             return html`<${ResourceCard} key=${r.id} resource=${r} />`;
           })}
           ${filtered.length === 0 ? html`
-            <div className="text-center py-12">
-              <i className="fa-solid fa-building-circle-xmark text-3xl text-cream-darker mb-3"></i>
-              <p className="text-sm text-bark-lighter">No resources found matching your search</p>
+            <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fa-solid fa-building-circle-xmark text-3xl text-slate-200"></i>
+              </div>
+              <p className="text-sm font-bold text-navy">No resources found</p>
+              <p className="text-xs font-kufi text-slate-400 mt-1">لا توجد موارد تطابق بحثك</p>
             </div>
           ` : null}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // VOLUNTEER VIEW
+  // =========================================================
+  function VolunteerView(props) {
+    const opportunities = props.updates.filter(u => !u.is_verified || u.category === 'Health' || u.category === 'Food');
+    
+    return html`
+      <div className="px-4 pb-6 space-y-6">
+        <div className="fade-up pt-4">
+          <h1 className="text-3xl font-bold text-navy">Volunteer</h1>
+          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">Join the response effort / انضم إلى جهود الاستجابة</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-tealAccent to-navy p-6 rounded-premium text-white shadow-xl shadow-tealAccent/20 fade-up fade-up-delay-1">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-2xl">
+              <i className="fa-solid fa-hands-helping"></i>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg leading-tight">Ready to Help?</h3>
+              <p className="text-xs text-white/70 font-kufi">كن جزءاً من الحل اليوم</p>
+            </div>
+          </div>
+          <p className="text-sm leading-relaxed mb-4 text-white/90">We are looking for field volunteers, logistics coordinators, and medical professionals to support the ongoing efforts.</p>
+          <button className="w-full py-3 bg-white text-navy font-bold rounded-xl active:scale-[0.98] transition-all">
+            REGISTER AS VOLUNTEER
+          </button>
+        </div>
+
+        <div className="fade-up fade-up-delay-2">
+          <h2 className="text-sm font-black text-navy uppercase tracking-widest mb-4 flex items-center justify-between">
+            <span>Open Opportunities</span>
+            <span className="text-[10px] font-kufi text-slate-400">الفرص المتاحة</span>
+          </h2>
+          <div className="space-y-4">
+            ${opportunities.map((o, idx) => html`
+              <div key=${o.id} className="bg-white p-5 rounded-premium border border-slate-100 shadow-premium flex gap-4 fade-up" style=${{animationDelay: (0.3 + idx * 0.1) + 's'}}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style=${{backgroundColor: CATEGORY_COLORS[o.category] + '15', color: CATEGORY_COLORS[o.category]}}>
+                  <i className=${'fa-solid ' + CATEGORY_ICONS[o.category] + ' text-xl'}></i>
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-1">
+                    <h3 className="font-bold text-navy text-sm">${o.title || (o.category + ' Assistance')}</h3>
+                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-400 uppercase tracking-wider">Field</span>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-3">${o.description}</p>
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-navy">${o.category}</span>
+                      <span className="text-[9px] font-kufi text-slate-400">${ARABIC_LABELS[o.category]}</span>
+                    </div>
+                    <button className="text-[10px] font-black text-tealAccent uppercase tracking-widest flex items-center gap-1.5 group">
+                      APPLY NOW <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `)}
+          </div>
         </div>
       </div>
     `;
@@ -1048,10 +1187,12 @@
   function AnalyticsView(props) {
     if (props.user.role !== 'admin') {
       return html`
-        <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-          <i className="fa-solid fa-lock text-4xl text-cream-darker mb-4"></i>
-          <h2 className="text-xl text-bark font-bold mb-2">Access Denied</h2>
-          <p className="text-sm text-bark-lighter">You need Admin privileges to view this page.</p>
+        <div className="flex flex-col items-center justify-center h-full p-10 text-center">
+          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+            <i className="fa-solid fa-lock text-3xl text-slate-200"></i>
+          </div>
+          <h2 className="text-xl text-navy font-bold mb-2">Access Denied</h2>
+          <p className="text-xs text-slate-400 font-kufi">ليس لديك صلاحية للوصول إلى هذه الصفحة</p>
         </div>
       `;
     }
@@ -1061,40 +1202,46 @@
     const categories = ['Food', 'Health', 'Safety', 'Shelter'];
 
     return html`
-      <div className="px-4 pb-6 space-y-4 fade-in">
-        <div className="flex justify-between items-end mb-4">
-          <div>
-            <h1 className="text-2xl text-bark font-bold">Admin Analytics</h1>
-            <p className="text-sm text-bark-lighter">Gap Analysis & Heatmap</p>
+      <div className="px-4 pb-6 space-y-6 fade-in">
+        <div className="pt-4">
+          <h1 className="text-3xl font-bold text-navy">Analytics</h1>
+          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">Gap Analysis & Heatmap / تحليل الفجوات</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white p-5 rounded-premium border border-slate-100 shadow-premium group">
+            <div className="text-3xl font-black text-navy group-hover:text-tealAccent transition-colors">${totalReq}</div>
+            <div className="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-1">Total Updates</div>
+            <div className="text-[8px] font-kufi text-slate-300 mt-0.5">إجمالي التحديثات</div>
+          </div>
+          <div className="bg-white p-5 rounded-premium border border-slate-100 shadow-premium group">
+            <div className="text-3xl font-black text-tealAccent">${fulfilledReq}</div>
+            <div className="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-1">Verified</div>
+            <div className="text-[8px] font-kufi text-slate-300 mt-0.5">تم التحقق منها</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white p-4 rounded-xl border border-cream-darker text-center">
-            <div className="text-2xl font-bold text-bark">${totalReq}</div>
-            <div className="text-[10px] text-bark-lighter uppercase tracking-wider font-semibold">Total Requests</div>
-          </div>
-          <div className="bg-white p-4 rounded-xl border border-cream-darker text-center">
-            <div className="text-2xl font-bold text-verified">${fulfilledReq}</div>
-            <div className="text-[10px] text-bark-lighter uppercase tracking-wider font-semibold">Fulfilled / Verified</div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-cream-darker mb-4">
-          <h3 className="text-sm font-semibold text-bark mb-3">Needs by Category</h3>
-          <div className="space-y-3">
+        <div className="bg-white p-6 rounded-premium border border-slate-100 shadow-premium">
+          <h3 className="text-sm font-black text-navy uppercase tracking-widest mb-6 flex items-center justify-between">
+            <span>Needs distribution</span>
+            <span className="text-[10px] font-kufi text-slate-400">توزيع الاحتياجات</span>
+          </h3>
+          <div className="space-y-5">
             ${categories.map(cat => {
               const count = props.updates.filter(u => u.category === cat).length;
               const pct = totalReq ? Math.round((count / totalReq) * 100) : 0;
               const col = CATEGORY_COLORS[cat];
               return html`
-                <div key=${cat}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="font-semibold text-bark">${cat}</span>
-                    <span className="text-bark-lighter">${count} (${pct}%)</span>
+                <div key=${cat} className="group">
+                  <div className="flex justify-between items-end text-xs mb-2">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-navy">${cat}</span>
+                      <span className="text-[9px] font-kufi text-slate-400">${ARABIC_LABELS[cat]}</span>
+                    </div>
+                    <span className="font-black text-navy opacity-40 group-hover:opacity-100 transition-opacity">${count} (${pct}%)</span>
                   </div>
-                  <div className="w-full h-1.5 bg-cream-darker rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style=${{width: pct+'%', backgroundColor: col}}></div>
+                  <div className="w-full h-2 bg-slate-50 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-1000 ease-out" style=${{width: pct+'%', backgroundColor: col}}></div>
                   </div>
                 </div>
               `;
@@ -1102,17 +1249,22 @@
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-cream-darker">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-semibold text-bark">Heatmap Preview</h3>
-            <span className="bg-unverified/10 text-unverified text-[10px] px-2 py-1 rounded font-bold">LIVE</span>
+        <div className="bg-white p-6 rounded-premium border border-slate-100 shadow-premium">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-sm font-black text-navy uppercase tracking-widest">Urgency Heatmap</h3>
+              <p className="text-[10px] font-kufi text-slate-400">خريطة الحرارة للاحتياجات العاجلة</p>
+            </div>
+            <span className="bg-actionOrange/10 text-actionOrange text-[9px] px-2.5 py-1 rounded-lg font-black tracking-widest">LIVE</span>
           </div>
-          <div className="h-40 bg-cream-darker rounded-lg relative overflow-hidden flex items-center justify-center">
-            <i className="fa-solid fa-map-location-dot text-4xl text-white opacity-50 absolute"></i>
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-unverified/20 to-transparent mix-blend-multiply"></div>
-            <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-unverified/40 rounded-full blur-xl"></div>
-            <div className="absolute top-1/3 right-1/3 w-12 h-12 bg-terracotta/40 rounded-full blur-lg"></div>
-            <p className="z-10 text-xs font-bold text-bark bg-white/80 px-3 py-1.5 rounded-full backdrop-blur-sm shadow-sm">District 5 Critical Zone</p>
+          <div className="h-48 bg-slate-50 rounded-2xl relative overflow-hidden flex items-center justify-center border border-slate-100">
+            <i className="fa-solid fa-map-location-dot text-5xl text-slate-200 absolute"></i>
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-actionOrange/5 to-transparent mix-blend-multiply"></div>
+            <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-actionOrange/20 rounded-full blur-2xl animate-pulse"></div>
+            <div className="absolute top-1/3 right-1/3 w-20 h-20 bg-navy/10 rounded-full blur-xl"></div>
+            <p className="z-10 text-[10px] font-black text-navy bg-white/90 px-4 py-2 rounded-xl backdrop-blur-md shadow-lg border border-white uppercase tracking-widest">
+              District 5 Critical Zone
+            </p>
           </div>
         </div>
       </div>
@@ -1134,31 +1286,35 @@
     }, [props.updates, section]);
 
     var sectionLabels = { all:'All Updates', pending:'Pending Review', verified:'Verified' };
+    var sectionArabic = { all:'الكل', pending:'قيد المراجعة', verified:'تم التحقق' };
 
     return html`
-      <div className="px-4 pb-6 space-y-4">
-        <div className="fade-up">
-          <h1 className="text-2xl text-bark">Briefs</h1>
-          <p className="text-sm text-bark-lighter mt-0.5">
-            ${canApprove ? 'You can approve or reject pending updates' : 'Updates you submit will be reviewed by verified coordinators'}
+      <div className="px-4 pb-6 space-y-6">
+        <div className="fade-up pt-4">
+          <h1 className="text-3xl font-bold text-navy">Briefs</h1>
+          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">
+            ${canApprove ? 'Review and verify incoming reports / مراجعة التقارير الواردة' : 'Verified humanitarian intelligence / معلومات إنسانية موثقة'}
           </p>
         </div>
 
         <!-- Role indicator -->
         ${canApprove ? html`
-          <div className="fade-up fade-up-delay-1 flex items-center gap-2 p-3 rounded-xl border" style=${{backgroundColor:'rgba(45,122,58,0.06)', borderColor:'rgba(45,122,58,0.15)'}}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center" style=${{backgroundColor:'var(--verified)'}}>
-              <i className="fa-solid fa-shield-halved text-white text-xs"></i>
+          <div className="fade-up fade-up-delay-1 flex items-center gap-4 p-4 rounded-premium bg-tealAccent/5 border border-tealAccent/20">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-tealAccent shadow-lg shadow-tealAccent/20 text-white">
+              <i className="fa-solid fa-shield-check text-lg"></i>
             </div>
             <div>
-              <span className="text-xs font-semibold" style=${{color:'var(--verified)'}}>Coordinator Access</span>
-              <span className="text-xs text-bark-lighter ml-1">— ${props.user.role==='admin' ? 'Admin' : 'Verified Organization'}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-tealAccent uppercase tracking-widest">Coordinator Access</span>
+                <span className="text-[10px] px-2 py-0.5 bg-tealAccent/10 text-tealAccent rounded font-bold uppercase">${props.user.role}</span>
+              </div>
+              <p className="text-[10px] font-kufi text-slate-400 mt-0.5">لديك صلاحيات التحقق من التقارير</p>
             </div>
           </div>
         ` : null}
 
         <!-- Section tabs -->
-        <div className="fade-up fade-up-delay-1 flex gap-1 bg-cream-dark rounded-xl p-1">
+        <div className="fade-up fade-up-delay-1 flex p-1 bg-slate-50 rounded-2xl border border-slate-100">
           ${['all','pending','verified'].map(function(s) {
             var count = s==='pending' ? props.updates.filter(function(u){return !u.is_verified;}).length
                        : s==='verified' ? props.updates.filter(function(u){return u.is_verified;}).length
@@ -1166,23 +1322,30 @@
             var active = section === s;
             return html`
               <button key=${s} onClick=${function(){ setSection(s); }}
-                className=${'flex-1 py-2 rounded-lg text-xs font-semibold transition-all ' + (active ? 'bg-white text-bark shadow-sm' : 'text-bark-lighter')}
+                className=${'flex-1 flex flex-col items-center py-2.5 rounded-xl transition-all ' + (active ? 'bg-white text-navy shadow-premium' : 'text-slate-400 hover:text-slate-600')}
               >
-                ${sectionLabels[s]} ${html`<span className=${'ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ' + (s==='pending'&&count>0 ? 'bg-pending text-white' : active ? 'bg-cream-dark text-bark-light' : 'bg-transparent')}>${count}</span>`}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-widest">${sectionLabels[s]}</span>
+                  ${count > 0 ? html`<span className=${'flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black ' + (s==='pending' ? 'bg-actionOrange text-white' : 'bg-slate-100 text-slate-400')}>${count}</span>` : null}
+                </div>
+                <span className="text-[9px] font-kufi opacity-60">${sectionArabic[s]}</span>
               </button>
             `;
           })}
         </div>
 
         <!-- Updates list -->
-        <div className="space-y-3 fade-up fade-up-delay-2">
+        <div className="space-y-4 fade-up fade-up-delay-2">
           ${filtered.map(function(u) {
             return html`<${UpdateCard} key=${u.id} update=${u} showActions=${canApprove && !u.is_verified} onVerify=${props.onVerify} onReject=${props.onReject} />`;
           })}
           ${filtered.length === 0 ? html`
-            <div className="text-center py-12">
-              <i className="fa-solid fa-clipboard-check text-3xl text-cream-darker mb-3"></i>
-              <p className="text-sm text-bark-lighter">${section==='pending' ? 'No pending updates — all clear' : 'No updates in this category'}</p>
+            <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fa-solid fa-clipboard-check text-3xl text-slate-200"></i>
+              </div>
+              <p className="text-sm font-bold text-navy">${section==='pending' ? 'No pending reviews' : 'No updates found'}</p>
+              <p className="text-xs font-kufi text-slate-400 mt-1">لا توجد تقارير في هذا القسم</p>
             </div>
           ` : null}
         </div>
@@ -1195,21 +1358,24 @@
   // =========================================================
   function RoleSwitcher(props) {
     var roles = [
-      { key:'user', label:'Civilian', icon:'fa-user' },
-      { key:'verified_org', label:'Verified NGO', icon:'fa-hand-holding-heart' },
-      { key:'admin', label:'Admin', icon:'fa-shield-halved' },
+      { key:'user', label:'Civilian', icon:'fa-user', arabic:'مدني' },
+      { key:'verified_org', label:'NGO', icon:'fa-hand-holding-heart', arabic:'منظمة' },
+      { key:'admin', label:'Admin', icon:'fa-shield-halved', arabic:'مسؤول' },
     ];
     return html`
-      <div className="flex items-center gap-1.5 bg-cream-dark rounded-lg p-0.5">
+      <div className="flex items-center gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
         ${roles.map(function(r) {
           var active = props.role === r.key;
           return html`
             <button key=${r.key} onClick=${function(){ props.onChange(r.key); }}
-              className=${'px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-all flex items-center gap-1 ' + (active ? 'bg-white text-bark shadow-sm' : 'text-bark-lighter')}
+              className=${'flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ' + (active ? 'bg-white text-navy shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600')}
               title=${'Switch to ' + r.label + ' role'}
             >
-              <i className=${'fa-solid ' + r.icon}></i>
-              <span className="hidden sm:inline">${r.label}</span>
+              <i className=${'fa-solid ' + r.icon + ' text-[12px]'}></i>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">${r.label}</span>
+                <span className="text-[8px] font-kufi opacity-70 hidden sm:inline">${r.arabic}</span>
+              </div>
             </button>
           `;
         })}
@@ -1222,40 +1388,48 @@
   // =========================================================
   function DonationModal(props) {
     var options = [
-      { id: 'global1', name: 'PayPal International', icon: 'fa-brands fa-paypal', region: 'Global', type: 'paypal' },
-      { id: 'global2', name: 'Bitcoin / Crypto', icon: 'fa-brands fa-bitcoin', region: 'Global', type: 'crypto' },
-      { id: 'eu1', name: 'SEPA Bank Transfer', icon: 'fa-solid fa-building-columns', region: 'Europe', type: 'bank' },
-      { id: 'af1', name: 'Mobile Money (M-Pesa)', icon: 'fa-solid fa-mobile-screen', region: 'Africa', type: 'mobile' },
-      { id: 'asia1', name: 'AliPay / WeChat', icon: 'fa-brands fa-alipay', region: 'Asia', type: 'app' },
+      { id: 'global1', name: 'PayPal International', icon: 'fa-brands fa-paypal', region: 'Global', type: 'paypal', arabic:'بايبال العالمي' },
+      { id: 'global2', name: 'Bitcoin / Crypto', icon: 'fa-brands fa-bitcoin', region: 'Global', type: 'crypto', arabic:'عملات رقمية' },
+      { id: 'eu1', name: 'SEPA Bank Transfer', icon: 'fa-solid fa-building-columns', region: 'Europe', type: 'bank', arabic:'تحويل بنكي أوروبا' },
+      { id: 'af1', name: 'Mobile Money (M-Pesa)', icon: 'fa-solid fa-mobile-screen', region: 'Africa', type: 'mobile', arabic:'الدفع عبر الهاتف' },
+      { id: 'asia1', name: 'AliPay / WeChat', icon: 'fa-brands fa-alipay', region: 'Asia', type: 'app', arabic:'علي باي / وي تشات' },
     ];
 
     return html`
-      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Donation options">
-        <div className="absolute inset-0 bg-black/40" onClick=${props.onClose}></div>
-        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full bottom-safe overflow-y-auto" style=${{maxWidth:'480px',maxHeight:'90vh'}}>
-          <div className="sticky top-0 bg-cream pt-5 pb-3 px-6 flex items-center justify-between border-b border-cream-darker">
-            <h2 className="text-lg text-bark">Support Our Mission</h2>
-            <button onClick=${props.onClose} className="w-9 h-9 rounded-full bg-cream-dark flex items-center justify-center text-bark-light" aria-label="Close">
+      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Donation options">
+        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
+        <div className="slide-up relative bg-white rounded-3xl w-full max-w-[480px] overflow-hidden shadow-2xl">
+          <div className="bg-navy p-6 text-white relative">
+            <h2 className="text-xl font-bold">Support Our Mission</h2>
+            <p className="text-xs text-white/60 font-kufi mt-1">ساهم في دعم مهامنا الإنسانية</p>
+            <button onClick=${props.onClose} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all" aria-label="Close">
               <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
-          <div className="p-6 space-y-4">
-            <p className="text-sm text-bark-lighter mb-4">Choose a convenient payment method for your region to help fund humanitarian efforts.</p>
+          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar">
+            <p className="text-sm text-slate-500 leading-relaxed">Choose a convenient payment method for your region to help fund humanitarian efforts.</p>
             ${options.map(function(opt) {
               return html`
                 <button key=${opt.id} onClick=${function(){ showToast('Redirecting to ' + opt.name + '...', 'info'); props.onClose(); }} 
-                  className="w-full flex items-center gap-4 p-4 bg-white rounded-xl border border-cream-darker hover:border-terracotta/30 transition-all active:scale-[0.98]">
-                  <div className="w-10 h-10 rounded-full bg-cream-dark flex items-center justify-center flex-shrink-0 text-terracotta">
-                    <i className=${opt.icon + ' text-lg'}></i>
+                  className="w-full flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-tealAccent/30 hover:bg-white hover:shadow-premium transition-all active:scale-[0.98] group">
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-actionOrange group-hover:bg-actionOrange group-hover:text-white transition-all">
+                    <i className=${opt.icon + ' text-xl'}></i>
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="font-semibold text-bark text-sm">${opt.name}</div>
-                    <div className="text-xs text-bark-lighter mt-0.5"><i className="fa-solid fa-globe mr-1 text-bark-lighter opacity-70"></i>${opt.region}</div>
+                    <div className="font-bold text-navy text-sm">${opt.name}</div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">${opt.region}</span>
+                      <span className="text-[10px] font-kufi text-slate-300">· ${opt.arabic}</span>
+                    </div>
                   </div>
-                  <i className="fa-solid fa-arrow-up-right-from-square text-bark-lighter text-sm opacity-50"></i>
+                  <i className="fa-solid fa-chevron-right text-slate-300 text-xs group-hover:translate-x-1 transition-transform"></i>
                 </button>
               `;
             })}
+          </div>
+          <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
+            <i className="fa-solid fa-shield-heart text-tealAccent"></i>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">100% of proceeds go to the field</span>
           </div>
         </div>
       </div>
@@ -1282,53 +1456,59 @@
     const score = calculateTrustScore(org);
     const isVerified = org.verification_status === 'verified';
     const checkpoints = [
-      { label:'Documents Submitted',    done: org.docs_submitted,                    pts: 25 },
-      { label:'UN/OCHA Registered',     done: org.un_ocha_registered,               pts: 20 },
-      { label:'Field Contact Verified', done: org.has_field_contact,                 pts: 20 },
-      { label:'5+ Community Reports',   done: (org.community_reports||0) >= 5,       pts: 10 },
-      { label:'3+ Campaigns Fulfilled', done: (org.campaigns_fulfilled||0) >= 3,     pts: 15 },
-      { label:'30+ Days Active',        done: (org.days_active||0) >= 30,            pts: 10 },
+      { label:'Documents Submitted',    arabic:'تم تقديم المستندات',    done: org.docs_submitted,                    pts: 25 },
+      { label:'UN/OCHA Registered',     arabic:'مسجل لدى الأمم المتحدة', done: org.un_ocha_registered,               pts: 20 },
+      { label:'Field Contact Verified', arabic:'التحقق من الاتصال الميداني', done: org.has_field_contact,                 pts: 20 },
+      { label:'5+ Community Reports',   arabic:'أكثر من 5 بلاغات مجتمعية', done: (org.community_reports||0) >= 5,       pts: 10 },
+      { label:'3+ Campaigns Fulfilled', arabic:'إنجاز 3 حملات على الأقل',  done: (org.campaigns_fulfilled||0) >= 3,     pts: 15 },
+      { label:'30+ Days Active',        arabic:'نشط لأكثر من 30 يوماً',   done: (org.days_active||0) >= 30,            pts: 10 },
     ];
     return html`
-      <div className="bg-white rounded-2xl border border-cream-darker p-5">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white rounded-premium border border-slate-100 p-6 shadow-premium">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-sm font-bold text-bark">Trust Score</h3>
-            <p className="text-[11px] text-bark-lighter mt-0.5">Verification requires ${TRUST_THRESHOLD}+ points</p>
+            <h3 className="text-base font-bold text-navy">Trust Score</h3>
+            <p className="text-[10px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">Verification requires ${TRUST_THRESHOLD}+ points</p>
           </div>
           ${isVerified
-            ? html`<span className="text-xs font-bold text-verified bg-verified/10 px-2.5 py-1 rounded-full flex items-center gap-1.5"><i className="fa-solid fa-circle-check"></i>Verified</span>`
-            : html`<span className="text-2xl font-black text-bark">${score}<span className="text-sm font-normal text-bark-lighter">/100</span></span>`
+            ? html`<span className="text-[10px] font-black text-tealAccent bg-tealAccent/10 px-3 py-1.5 rounded-lg flex items-center gap-2 uppercase tracking-widest"><i className="fa-solid fa-circle-check"></i>Verified</span>`
+            : html`<div className="text-right"><span className="text-3xl font-black text-navy">${score}</span><span className="text-xs font-bold text-slate-300 ml-1">/ 100</span></div>`
           }
         </div>
-        <div className="relative w-full h-2 bg-cream-dark rounded-full mb-5 mt-4">
-          <div className="h-full rounded-full transition-all duration-700"
-            style=${{ width: score+'%', background: score >= TRUST_THRESHOLD ? 'var(--verified)' : 'linear-gradient(90deg,var(--terracotta),#E8963A)' }}>
+        <div className="relative w-full h-3 bg-slate-50 rounded-full mb-8">
+          <div className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm"
+            style=${{ width: score+'%', background: score >= TRUST_THRESHOLD ? 'var(--teal-accent)' : 'linear-gradient(90deg, var(--action-orange), #fbbf24)' }}>
           </div>
-          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-bark/30 rounded"
+          <div className="absolute top-1/2 -translate-y-1/2 w-1 h-5 bg-navy/20 rounded-full"
             style=${{ left: TRUST_THRESHOLD+'%' }}>
           </div>
-          <span className="absolute -top-5 text-[10px] font-bold text-bark-lighter"
+          <span className="absolute -top-6 text-[9px] font-black text-slate-400 uppercase tracking-widest"
             style=${{ left: TRUST_THRESHOLD+'%', transform:'translateX(-50%)' }}>
-            ${TRUST_THRESHOLD} min
+            MIN ${TRUST_THRESHOLD}
           </span>
         </div>
-        <div className="space-y-2.5">
+        <div className="grid grid-cols-1 gap-4">
           ${checkpoints.map(function(cp) {
             return html`
-              <div key=${cp.label} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <i className=${'fa-solid text-sm ' + (cp.done ? 'fa-circle-check text-verified' : 'fa-circle text-cream-darker')}></i>
-                  <span className=${'text-xs ' + (cp.done ? 'text-bark font-medium' : 'text-bark-lighter')}>${cp.label}</span>
+              <div key=${cp.label} className="flex items-center justify-between group">
+                <div className="flex items-center gap-3">
+                  <div className=${'w-6 h-6 rounded-lg flex items-center justify-center transition-all ' + (cp.done ? 'bg-tealAccent/10 text-tealAccent' : 'bg-slate-50 text-slate-200')}>
+                    <i className=${'fa-solid ' + (cp.done ? 'fa-check' : 'fa-circle-notch')}></i>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className=${'text-[11px] font-bold ' + (cp.done ? 'text-navy' : 'text-slate-400')}>${cp.label}</span>
+                    <span className="text-[9px] font-kufi text-slate-300">${cp.arabic}</span>
+                  </div>
                 </div>
-                <span className="text-[11px] font-bold text-bark-lighter">+${cp.pts} pts</span>
+                <span className=${'text-[10px] font-black ' + (cp.done ? 'text-tealAccent' : 'text-slate-300')}>+${cp.pts}</span>
               </div>
             `;
           })}
         </div>
         ${!isVerified && score >= TRUST_THRESHOLD ? html`
-          <div className="mt-4 p-3 bg-verified/10 rounded-xl text-xs text-verified font-semibold flex items-center gap-2">
-            <i className="fa-solid fa-star"></i> Score qualifies — admin review pending
+          <div className="mt-8 p-4 bg-tealAccent/5 rounded-2xl text-[10px] text-tealAccent font-black flex items-center gap-3 border border-tealAccent/10 uppercase tracking-widest">
+            <i className="fa-solid fa-sparkles text-sm"></i>
+            <span>Score qualifies — admin review pending</span>
           </div>
         ` : null}
       </div>
@@ -1341,54 +1521,54 @@
   const URGENCY_COLORS = { Low:'#2D7A3A', Medium:'#C4960C', High:'#CC5500', Critical:'#B83B2E' };
 
   function CampaignCard({ campaign, showActions, onFulfill }) {
-    const col = URGENCY_COLORS[campaign.urgency_level] || '#6B5344';
+    const col = CATEGORY_COLORS[campaign.urgency_level] || URGENCY_COLORS[campaign.urgency_level] || '#6B5344';
     const pct = campaign.quantity_needed
       ? Math.min(100, Math.round((campaign.quantity_fulfilled / campaign.quantity_needed) * 100))
       : 0;
     const isFulfilled = campaign.status === 'fulfilled';
     return html`
-      <div className=${'bg-white rounded-xl border border-cream-darker p-4 fade-up ' + (isFulfilled ? 'opacity-60' : '')}>
-        <div className="flex items-start gap-2 mb-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white flex-shrink-0"
+      <div className=${'bg-white rounded-premium border border-slate-100 p-5 shadow-premium fade-up ' + (isFulfilled ? 'opacity-60 grayscale' : '')}>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded text-white"
                 style=${{ backgroundColor: col }}>${campaign.urgency_level}</span>
-              <span className="text-[10px] font-semibold text-bark-lighter uppercase">${campaign.category}</span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${campaign.category}</span>
             </div>
-            <h3 className="font-semibold text-bark text-sm leading-snug">${campaign.title}</h3>
+            <h3 className="font-bold text-navy text-sm leading-tight">${campaign.title}</h3>
           </div>
-          ${isFulfilled
-            ? html`<span className="text-[10px] font-bold text-verified bg-verified/10 px-2 py-0.5 rounded-full flex-shrink-0"><i className="fa-solid fa-check mr-1"></i>Done</span>`
-            : campaign.is_verified
-              ? html`<span className="text-[10px] font-bold text-verified bg-verified/10 px-2 py-0.5 rounded-full flex-shrink-0"><i className="fa-solid fa-circle-dot mr-1"></i>Live</span>`
-              : html`<span className="text-[10px] font-bold text-pending bg-pending/10 px-2 py-0.5 rounded-full flex-shrink-0"><i className="fa-solid fa-clock mr-1"></i>Pending</span>`
-          }
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 text-slate-300">
+            <i className=${'fa-solid ' + (CATEGORY_ICONS[campaign.category] || 'fa-box')}></i>
+          </div>
         </div>
-        <p className="text-xs text-bark-light leading-relaxed mb-2">${campaign.description}</p>
-        ${campaign.location_label ? html`
-          <p className="text-xs text-bark-lighter mb-2">
-            <i className="fa-solid fa-location-dot text-terracotta/50 mr-1"></i>${campaign.location_label}
-          </p>
-        ` : null}
+        <p className="text-xs text-slate-500 leading-relaxed mb-4">${campaign.description}</p>
+        
         ${campaign.quantity_needed ? html`
-          <div className="mb-3">
-            <div className="flex justify-between text-[11px] mb-1">
-              <span className="text-bark-lighter">Progress</span>
-              <span className="font-bold text-bark">${campaign.quantity_fulfilled}/${campaign.quantity_needed} ${campaign.quantity_unit}</span>
+          <div className="mb-4">
+            <div className="flex justify-between text-[10px] mb-2">
+              <span className="text-slate-400 font-bold uppercase tracking-widest">Progress</span>
+              <span className="font-black text-navy">${campaign.quantity_fulfilled} / ${campaign.quantity_needed} ${campaign.quantity_unit}</span>
             </div>
-            <div className="w-full h-1.5 bg-cream-dark rounded-full overflow-hidden">
-              <div className="h-full rounded-full transition-all"
-                style=${{ width: pct+'%', backgroundColor: isFulfilled ? 'var(--verified)' : col }}></div>
+            <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-1000"
+                style=${{ width: pct+'%', backgroundColor: isFulfilled ? 'var(--teal-accent)' : col }}></div>
             </div>
           </div>
         ` : null}
-        <div className="flex items-center justify-between text-[11px] text-bark-lighter pt-2 border-t border-cream-dark">
-          <span>${timeAgo(campaign.created_at)}</span>
+
+        <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-slate-400">${timeAgo(campaign.created_at)}</span>
+          </div>
           ${showActions && !isFulfilled ? html`
             <button onClick=${function() { onFulfill(campaign.id); }}
-              className="font-semibold text-verified flex items-center gap-1 hover:underline">
-              <i className="fa-solid fa-circle-check"></i> Mark Fulfilled
+              className="text-[10px] font-black text-tealAccent uppercase tracking-widest flex items-center gap-1.5 group">
+              <i className="fa-solid fa-circle-check"></i> Mark Done
             </button>
+          ` : isFulfilled ? html`
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1.5">
+              <i className="fa-solid fa-check-double"></i> Completed
+            </span>
           ` : null}
         </div>
       </div>
@@ -1404,15 +1584,15 @@
     const markerRef = useRef(null);
     useEffect(function() {
       if (!containerRef.current || mapRef.current) return;
-      var map = L.map(containerRef.current, { center:[37.066,37.383], zoom:13 });
+      var map = L.map(containerRef.current, { center:[37.066,37.383], zoom:13, zoomControl:false });
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(map);
       map.on('click', function(e) {
         if (markerRef.current) markerRef.current.remove();
         markerRef.current = L.marker([e.latlng.lat, e.latlng.lng], {
           icon: L.divIcon({
             className: '',
-            html: '<div style="width:22px;height:22px;background:var(--terracotta);border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>',
-            iconSize:[22,22], iconAnchor:[11,11]
+            html: '<div style="width:24px;height:24px;background:var(--action-orange);border-radius:10px 10px 0 10px;border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transform:rotate(45deg)"></div>',
+            iconSize:[24,24], iconAnchor:[12,24]
           })
         }).addTo(map);
         onChange({ lat: e.latlng.lat, lng: e.latlng.lng });
@@ -1422,16 +1602,17 @@
       return function() { if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; } };
     }, []);
     return html`
-      <div>
-        <p className="text-xs text-bark-lighter mb-2 flex items-center gap-1.5">
-          <i className="fa-solid fa-hand-pointer text-terracotta"></i>
-          Tap the map to pin the exact location of this need
+      <div className="space-y-3">
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+          <i className="fa-solid fa-map-pin text-actionOrange"></i>
+          Select target location / اختر الموقع المستهدف
         </p>
         <div ref=${containerRef}
-          style=${{ height:'210px', borderRadius:'12px', overflow:'hidden', border:'2px solid var(--cream-darker)' }} />
+          className="shadow-inner border-2 border-slate-100"
+          style=${{ height:'240px', borderRadius:'24px', overflow:'hidden' }} />
         ${value
-          ? html`<p className="text-xs text-verified font-semibold mt-2 flex items-center gap-1.5"><i className="fa-solid fa-circle-check"></i>Pinned: ${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}</p>`
-          : html`<p className="text-xs text-bark-lighter mt-2">No location pinned yet</p>`
+          ? html`<p className="text-[10px] font-black text-tealAccent uppercase tracking-widest flex items-center gap-2"><i className="fa-solid fa-circle-check"></i>Pinned: ${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}</p>`
+          : html`<p className="text-[10px] font-kufi text-slate-300">انقر على الخريطة لتحديد الموقع</p>`
         }
       </div>
     `;
@@ -1453,7 +1634,8 @@
     const [isSubmitting, setIsSubmitting] = useState(false);
     function patch(k, v) { setForm(function(f){ return Object.assign({}, f, {[k]:v}); }); }
 
-    const stepTitles = ['Need Type','Details','Location','Urgency','Review & Post'];
+    const stepTitles = ['Need Type','Details','Location','Urgency','Review'];
+    const stepArabic = ['نوع الاحتياج','التفاصيل','الموقع','الأهمية','المراجعة'];
     const stepValid = {
       1: !!form.category,
       2: form.title.trim().length >= 5 && form.description.trim().length >= 10,
@@ -1493,47 +1675,53 @@
     }
 
     return html`
-      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick=${onClose}></div>
-        <div className="slide-up relative bg-cream rounded-t-3xl sm:rounded-3xl w-full bottom-safe overflow-y-auto" style=${{ maxWidth:'520px', maxHeight:'92vh' }}>
+      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${onClose}></div>
+        <div className="slide-up relative bg-white rounded-3xl w-full max-w-[520px] overflow-hidden shadow-2xl">
 
           <!-- Header + step dots -->
-          <div className="sticky top-0 bg-cream/95 backdrop-blur-md pt-5 pb-3 px-6 border-b border-cream-darker z-10">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-navy p-6 text-white relative">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-bold text-bark">Post a Live Need</h2>
-                <p className="text-xs text-bark-lighter">Step ${step}/5 — ${stepTitles[step-1]}</p>
+                <h2 className="text-xl font-bold">Post a Live Need</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Step ${step}/5</span>
+                  <span className="text-[10px] font-kufi text-white/40">· ${stepArabic[step-1]}</span>
+                </div>
               </div>
               <button type="button" onClick=${onClose}
-                className="w-8 h-8 rounded-full bg-cream-dark flex items-center justify-center text-bark-light" aria-label="Close">
-                <i className="fa-solid fa-xmark text-sm"></i>
+                className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all">
+                <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               ${[1,2,3,4,5].map(function(s) {
-                return html`<div key=${s} className=${'flex-1 h-1 rounded-full transition-all ' + (s < step ? 'bg-verified' : s === step ? 'bg-terracotta' : 'bg-cream-dark')}></div>`;
+                return html`<div key=${s} className=${'flex-1 h-1.5 rounded-full transition-all duration-500 ' + (s <= step ? 'bg-tealAccent shadow-[0_0_8px_var(--teal-accent)]' : 'bg-white/10')}></div>`;
               })}
             </div>
           </div>
 
-          <form onSubmit=${handleSubmit} className="p-6">
+          <form onSubmit=${handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto no-scrollbar">
 
             <!-- Step 1: Category -->
             ${step === 1 ? html`
-              <div className="fade-in space-y-3">
-                <p className="text-sm font-semibold text-bark mb-3">What type of need are you posting?</p>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="fade-in space-y-4">
+                <p className="text-sm font-bold text-navy uppercase tracking-widest">Select Category / اختر الفئة</p>
+                <div className="grid grid-cols-2 gap-3">
                   ${LIVE_CATEGORIES.map(function(cat) {
                     const active = form.category === cat;
                     const col = CATEGORY_COLORS[cat] || '#6B5344';
                     return html`
                       <button key=${cat} type="button" onClick=${function(){ patch('category', cat); }}
-                        className=${'p-3 rounded-xl border-2 flex items-center gap-2.5 transition-all ' + (active ? 'border-terracotta bg-terracotta/5' : 'border-cream-darker bg-white')}>
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style=${{ backgroundColor: active ? col : 'var(--cream-dark)' }}>
-                          <i className=${'fa-solid ' + (LIVE_CAT_ICONS[cat]||'fa-circle') + ' text-sm'} style=${{ color: active ? 'white' : col }}></i>
+                        className=${'p-4 rounded-2xl border-2 flex flex-col items-center gap-3 transition-all ' + (active ? 'border-tealAccent bg-tealAccent/5' : 'border-slate-50 bg-slate-50/50 hover:border-slate-100')}>
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-all"
+                          style=${{ backgroundColor: active ? col : 'white', color: active ? 'white' : col, boxShadow: active ? '0 8px 15px ' + col + '30' : 'none' }}>
+                          <i className=${'fa-solid ' + (LIVE_CAT_ICONS[cat]||'fa-circle')}></i>
                         </div>
-                        <span className=${'text-xs font-semibold ' + (active ? 'text-bark' : 'text-bark-light')}>${cat}</span>
+                        <div className="text-center">
+                          <span className=${'text-[10px] font-black uppercase tracking-widest block ' + (active ? 'text-navy' : 'text-slate-400')}>${cat}</span>
+                          <span className="text-[9px] font-kufi text-slate-300 mt-0.5">${ARABIC_LABELS[cat]}</span>
+                        </div>
                       </button>
                     `;
                   })}
@@ -1543,158 +1731,144 @@
 
             <!-- Step 2: Details -->
             ${step === 2 ? html`
-              <div className="fade-in space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-bark mb-1.5">Need Title <span className="text-unverified">*</span></label>
+              <div className="fade-in space-y-6">
+                <div className="group">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-tealAccent transition-colors">Need Title / عنوان الاحتياج</label>
                   <input type="text" value=${form.title} maxlength="150" required
                     onInput=${function(e){ patch('title', e.target.value); }}
-                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                    placeholder="e.g. 200 Blankets Needed for District 3 Families" />
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-5 py-4 text-sm font-medium text-navy focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent transition-all"
+                    placeholder="e.g. 200 Blankets Needed for District 3" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-bark mb-1.5">Description <span className="text-unverified">*</span></label>
-                  <textarea value=${form.description} rows="3"
+                <div className="group">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-tealAccent transition-colors">Description / الوصف التفصيلي</label>
+                  <textarea value=${form.description} rows="4"
                     onInput=${function(e){ patch('description', e.target.value); }}
-                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30 resize-none"
-                    placeholder="Who needs it, how urgent, what impact donations will have..."></textarea>
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-5 py-4 text-sm font-medium text-navy focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent transition-all resize-none"
+                    placeholder="Detailed explanation of the requirements..."></textarea>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-bark mb-1.5">Quantity Needed</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="group">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Quantity / الكمية</label>
                     <input type="number" min="1" value=${form.quantity_needed}
                       onInput=${function(e){ patch('quantity_needed', e.target.value); }}
-                      className="w-full rounded-xl border border-cream-darker bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                      placeholder="200" />
+                      className="w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-5 py-4 text-sm font-medium text-navy focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent transition-all" />
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-bark mb-1.5">Unit</label>
+                  <div className="group">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unit / الوحدة</label>
                     <select value=${form.quantity_unit} onChange=${function(e){ patch('quantity_unit', e.target.value); }}
-                      className="w-full rounded-xl border border-cream-darker bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30">
+                      className="w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-5 py-4 text-sm font-medium text-navy focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent transition-all appearance-none">
                       ${['units','kg','pallets','meals','kits','families','liters','vehicles'].map(function(u) {
-                        return html`<option key=${u} value=${u}>${u}</option>`;
+                        return html`<option key=${u} value=${u}>${u.toUpperCase()}</option>`;
                       })}
                     </select>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-bark mb-1.5">Volunteer Slots (0 = none)</label>
-                  <input type="number" min="0" value=${form.volunteer_slots}
-                    onInput=${function(e){ patch('volunteer_slots', e.target.value); }}
-                    className="w-full rounded-xl border border-cream-darker bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                    placeholder="0" />
                 </div>
               </div>
             ` : null}
 
             <!-- Step 3: Location picker -->
             ${step === 3 ? html`
-              <div className="fade-in space-y-3">
+              <div className="fade-in space-y-6">
                 <${LeafletLocationPicker} value=${form.location_coords} onChange=${function(c){ patch('location_coords', c); }} />
-                <div>
-                  <label className="block text-xs font-semibold text-bark mb-1.5">Location Label (optional)</label>
+                <div className="group">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-tealAccent transition-colors">Location Label / اسم الموقع</label>
                   <input type="text" value=${form.location_label}
                     onInput=${function(e){ patch('location_label', e.target.value); }}
-                    className="w-full rounded-xl border border-cream-darker bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta/30"
-                    placeholder="e.g. District 3, near the old school" />
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-5 py-4 text-sm font-medium text-navy focus:outline-none focus:ring-4 focus:ring-tealAccent/5 focus:border-tealAccent transition-all"
+                    placeholder="e.g. District 3 Community Center" />
                 </div>
               </div>
             ` : null}
 
-            <!-- Step 4: Urgency + Privacy -->
+            <!-- Step 4: Urgency -->
             ${step === 4 ? html`
-              <div className="fade-in space-y-5">
+              <div className="fade-in space-y-8">
                 <div>
-                  <label className="block text-sm font-semibold text-bark mb-2">Urgency Level</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Urgency Level / مستوى الأهمية</label>
+                  <div className="grid grid-cols-2 gap-3">
                     ${['Low','Medium','High','Critical'].map(function(level) {
                       const active = form.urgency_level === level;
                       const col = URGENCY_COLORS[level];
                       return html`
                         <button key=${level} type="button" onClick=${function(){ patch('urgency_level', level); }}
-                          className=${'py-3 rounded-xl border-2 text-xs font-bold uppercase tracking-wide transition-all ' + (active ? 'text-white' : 'bg-white border-cream-darker text-bark-lighter')}
-                          style=${active ? { backgroundColor: col, borderColor: col } : {}}>
+                          className=${'p-4 rounded-2xl border-2 font-black uppercase tracking-widest text-[10px] transition-all ' + (active ? 'text-white' : 'bg-slate-50 border-slate-100 text-slate-400')}
+                          style=${active ? { backgroundColor: col, borderColor: col, boxShadow: '0 8px 15px ' + col + '30' } : {}}>
                           ${level}
                         </button>
                       `;
                     })}
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-cream-darker">
-                  <input type="checkbox" id="loc-mask" checked=${form.is_location_masked}
-                    onChange=${function(e){ patch('is_location_masked', e.target.checked); }}
-                    className="mt-0.5 accent-terracotta" />
-                  <label htmlFor="loc-mask" className="cursor-pointer">
-                    <span className="text-sm font-semibold text-bark block">Mask Exact Location</span>
-                    <span className="text-xs text-bark-lighter">Shows general area only — recommended for sensitive or women's shelter needs</span>
-                  </label>
+                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
+                  <div className="relative inline-block w-12 h-6 flex-shrink-0">
+                    <input type="checkbox" id="loc-mask" checked=${form.is_location_masked}
+                      onChange=${function(e){ patch('is_location_masked', e.target.checked); }}
+                      className="peer absolute w-full h-full opacity-0 cursor-pointer z-10" />
+                    <div className="w-full h-full bg-slate-200 rounded-full peer-checked:bg-tealAccent transition-colors"></div>
+                    <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-6"></div>
+                  </div>
+                  <div>
+                    <label htmlFor="loc-mask" className="text-xs font-bold text-navy block">Mask Exact Location</label>
+                    <p className="text-[10px] text-slate-400 mt-1">Recommended for sensitive or high-security needs.</p>
+                  </div>
                 </div>
               </div>
             ` : null}
 
-            <!-- Step 5: Review & Submit -->
+            <!-- Step 5: Review -->
             ${step === 5 ? html`
-              <div className="fade-in space-y-4">
-                <div className="bg-white rounded-xl border border-cream-darker p-4 space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-bark-lighter font-medium">Category</span>
-                    <span className="font-semibold text-bark">${form.category}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-bark-lighter font-medium">Urgency</span>
-                    <span className="font-bold" style=${{ color: URGENCY_COLORS[form.urgency_level] }}>${form.urgency_level}</span>
+              <div className="fade-in space-y-6">
+                <div className="bg-slate-50 rounded-3xl p-6 space-y-4 border border-slate-100">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Category</span>
+                      <span className="text-xs font-bold text-navy">${form.category}</span>
+                    </div>
+                    <div className="flex flex-col text-right">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Urgency</span>
+                      <span className="text-xs font-black" style=${{ color: URGENCY_COLORS[form.urgency_level] }}>${form.urgency_level.toUpperCase()}</span>
+                    </div>
                   </div>
                   <div>
-                    <span className="text-bark-lighter font-medium block mb-1">Title</span>
-                    <span className="font-semibold text-bark text-sm">${form.title}</span>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Title</span>
+                    <span className="text-sm font-bold text-navy">${form.title}</span>
                   </div>
                   <div>
-                    <span className="text-bark-lighter font-medium block mb-1">Description</span>
-                    <p className="text-bark text-xs leading-relaxed">${form.description}</p>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Quantity</span>
+                    <span className="text-xs font-bold text-navy">${form.quantity_needed} ${form.quantity_unit}</span>
                   </div>
-                  ${form.location_label ? html`
-                    <div className="flex justify-between">
-                      <span className="text-bark-lighter font-medium">Location</span>
-                      <span className="font-semibold text-bark text-xs">${form.location_label}</span>
-                    </div>
-                  ` : null}
-                  ${form.quantity_needed ? html`
-                    <div className="flex justify-between">
-                      <span className="text-bark-lighter font-medium">Quantity</span>
-                      <span className="font-semibold text-bark">${form.quantity_needed} ${form.quantity_unit}</span>
-                    </div>
-                  ` : null}
                 </div>
-                <div className="flex items-center gap-2 p-3 bg-terracotta/8 rounded-xl text-xs text-bark-light border border-terracotta/15">
-                  <i className="fa-solid fa-circle-info text-terracotta"></i>
-                  This need will be published live on the public map immediately.
+                <div className="flex items-center gap-4 p-5 bg-tealAccent/5 rounded-2xl border border-tealAccent/10">
+                  <div className="w-10 h-10 bg-tealAccent/10 rounded-xl flex items-center justify-center text-tealAccent">
+                    <i className="fa-solid fa-bullhorn text-lg"></i>
+                  </div>
+                  <p className="text-[10px] font-bold text-tealAccent uppercase tracking-widest leading-relaxed">Publishing this will make it visible to all verified humanitarian responders.</p>
                 </div>
               </div>
             ` : null}
 
             <!-- Navigation buttons -->
-            <div className=${'flex gap-2 mt-6 ' + (step === 1 ? 'justify-end' : '')}>
+            <div className="flex gap-4 pt-4">
               ${step > 1 ? html`
                 <button type="button" onClick=${function(){ setStep(step-1); }}
-                  className="flex-1 py-3 rounded-xl bg-cream-dark text-bark font-semibold text-sm">
-                  <i className="fa-solid fa-arrow-left mr-1.5"></i> Back
+                  className="flex-1 py-4 rounded-2xl bg-slate-100 text-navy font-black text-[11px] uppercase tracking-widest active:scale-95 transition-all">
+                  Back
                 </button>
               ` : null}
               ${step < 5 ? html`
                 <button type="button" onClick=${function(){ setStep(step+1); }}
                   disabled=${!stepValid[step]}
-                  className="flex-1 py-3 rounded-xl bg-bark text-white font-semibold text-sm disabled:opacity-40">
-                  Next <i className="fa-solid fa-arrow-right ml-1.5"></i>
+                  className="flex-1 py-4 rounded-2xl bg-navy text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-navy/20 disabled:opacity-30 active:scale-95 transition-all">
+                  Next Step
                 </button>
               ` : html`
                 <button type="submit" disabled=${isSubmitting}
-                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-                  style=${{ background:'linear-gradient(135deg,var(--terracotta),#E8963A)' }}>
-                  ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin"></i>` : html`<i className="fa-solid fa-bullhorn"></i>`}
-                  ${isSubmitting ? 'Posting...' : 'Post Live Need'}
+                  className="flex-1 py-4 rounded-2xl bg-tealAccent text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-tealAccent/20 disabled:opacity-50 active:scale-95 transition-all flex items-center justify-center gap-2">
+                  ${isSubmitting ? html`<i className="fa-solid fa-spinner fa-spin"></i>` : html`<i className="fa-solid fa-paper-plane"></i>`}
+                  <span>${isSubmitting ? 'Publishing...' : 'Publish Live Need'}</span>
                 </button>
               `}
             </div>
-
           </form>
         </div>
       </div>
@@ -1712,46 +1886,46 @@
     const totalReached = campaigns.reduce(function(acc, c){ return acc + (c.quantity_fulfilled||0); }, 0);
 
     return html`
-      <div className="px-4 pb-6 space-y-5 fade-in">
+      <div className="px-4 pb-6 space-y-6 fade-in">
 
         <!-- Org profile card -->
-        <div className="bg-white rounded-2xl border border-cream-darker p-5">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-2xl font-bold shadow-sm"
-              style=${{ background:'linear-gradient(135deg,var(--terracotta),#E8963A)' }}>
+        <div className="bg-white rounded-premium border border-slate-100 p-6 shadow-premium">
+          <div className="flex items-start gap-5">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-2xl font-black shadow-lg shadow-actionOrange/20"
+              style=${{ background:'linear-gradient(135deg, var(--action-orange), #fbbf24)' }}>
               ${org.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-base font-bold text-bark leading-tight">${org.name}</h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-xl font-bold text-navy leading-tight">${org.name}</h1>
                 ${isVerified ? html`
-                  <span className="text-[10px] font-bold text-verified bg-verified/10 px-2 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0">
+                  <span className="text-[9px] font-black text-tealAccent bg-tealAccent/10 px-2.5 py-1 rounded-lg flex items-center gap-1.5 uppercase tracking-widest">
                     <i className="fa-solid fa-circle-check"></i> Verified NGO
                   </span>
                 ` : html`
-                  <span className="text-[10px] font-bold text-pending bg-pending/10 px-2 py-0.5 rounded-full flex-shrink-0">
-                    <i className="fa-solid fa-clock mr-1"></i>Pending Verification
+                  <span className="text-[9px] font-black text-actionOrange bg-actionOrange/10 px-2.5 py-1 rounded-lg flex items-center gap-1.5 uppercase tracking-widest">
+                    <i className="fa-solid fa-clock"></i> Verification Pending
                   </span>
                 `}
               </div>
-              <p className="text-xs text-bark-lighter mt-1">${org.address}</p>
+              <p className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-wider">${org.address}</p>
             </div>
           </div>
-          <p className="text-sm text-bark-light leading-relaxed mt-3">${org.description}</p>
+          <p className="text-sm text-slate-500 leading-relaxed mt-4">${org.description}</p>
 
           <!-- Impact stats row -->
-          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-cream-dark">
-            <div className="text-center">
-              <div className="text-xl font-black text-terracotta">${active.length}</div>
-              <div className="text-[10px] text-bark-lighter uppercase tracking-wide font-semibold mt-0.5">Live Needs</div>
+          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-50">
+            <div className="text-center group">
+              <div className="text-2xl font-black text-navy group-hover:text-actionOrange transition-colors">${active.length}</div>
+              <div className="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-1">Live Needs</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-black text-verified">${fulfilled.length}</div>
-              <div className="text-[10px] text-bark-lighter uppercase tracking-wide font-semibold mt-0.5">Fulfilled</div>
+            <div className="text-center group">
+              <div className="text-2xl font-black text-tealAccent">${fulfilled.length}</div>
+              <div className="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-1">Fulfilled</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-black text-bark">${totalReached}</div>
-              <div className="text-[10px] text-bark-lighter uppercase tracking-wide font-semibold mt-0.5">Units Delivered</div>
+            <div className="text-center group">
+              <div className="text-2xl font-black text-navy group-hover:text-tealAccent transition-colors">${totalReached}</div>
+              <div className="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-1">Units Sent</div>
             </div>
           </div>
         </div>
@@ -1760,31 +1934,38 @@
         <${TrustScoreMeter} org=${org} />
 
         <!-- Post Live Need CTA -->
-        ${isVerified ? html`
-          <button onClick=${onPostNeed}
-            className="w-full py-4 rounded-2xl text-white font-black text-sm flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] transition-transform border border-white/20"
-            style=${{ background:'linear-gradient(135deg,#C41E3A,var(--terracotta))' }}>
-            <i className="fa-solid fa-bullhorn text-lg"></i>
-            Post a Live Need
-          </button>
-        ` : html`
-          <div className="w-full py-4 rounded-2xl bg-cream-dark text-bark-lighter text-sm flex items-center justify-center gap-2 border border-cream-darker">
-            <i className="fa-solid fa-lock"></i>
-            Posting requires verified status
-          </div>
-        `}
+        <div className="fade-up fade-up-delay-1">
+          ${isVerified ? html`
+            <button onClick=${onPostNeed}
+              className="w-full py-5 rounded-premium text-white font-black text-sm flex items-center justify-center gap-4 shadow-xl active:scale-[0.98] transition-all uppercase tracking-widest border border-white/20"
+              style=${{ background:'linear-gradient(135deg, var(--navy), var(--teal-accent))' }}>
+              <i className="fa-solid fa-bullhorn text-xl"></i>
+              Post a Live Need
+            </button>
+          ` : html`
+            <div className="w-full py-5 rounded-premium bg-slate-50 text-slate-300 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 border border-slate-100">
+              <i className="fa-solid fa-lock text-lg"></i>
+              Posting requires verified status
+            </div>
+          `}
+        </div>
 
         <!-- Campaigns list -->
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-bark">Your Campaigns</h2>
-            <span className="text-xs font-bold text-terracotta bg-terracotta/10 px-2 py-1 rounded-lg">${active.length} Active</span>
+        <div className="fade-up fade-up-delay-2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-black text-navy uppercase tracking-widest">Your Campaigns</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-actionOrange bg-actionOrange/10 px-2 py-1 rounded uppercase tracking-wider">${active.length} Active</span>
+            </div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             ${campaigns.length === 0 ? html`
-              <div className="text-center py-10">
-                <i className="fa-solid fa-clipboard-list text-3xl text-cream-darker mb-3"></i>
-                <p className="text-sm text-bark-lighter">No campaigns yet — post your first Live Need above</p>
+              <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fa-solid fa-clipboard-list text-3xl text-slate-200"></i>
+                </div>
+                <p className="text-sm font-bold text-navy">No campaigns yet</p>
+                <p className="text-xs font-kufi text-slate-400 mt-1">ابدأ بنشر أول احتياج ميداني اليوم</p>
               </div>
             ` : campaigns.map(function(c) {
               return html`

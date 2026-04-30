@@ -6,8 +6,8 @@
 //   Supabase REST   → Stale-While-Revalidate
 //   Supabase Auth   → Network-only (never cache tokens)
 // ============================================================
-const CACHE_VERSION = 'mdaad-now-v4';
-const DATA_CACHE    = 'mdaad-data-v4';
+const CACHE_VERSION = 'mdaad-now-v5';
+const DATA_CACHE    = 'mdaad-data-v5';
 
 const STATIC_ASSETS = [
   '/',
