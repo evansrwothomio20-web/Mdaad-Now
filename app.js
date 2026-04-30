@@ -731,6 +731,7 @@
     var verifiedCount = props.resources.filter(function(r){ return r.verification_status==='verified'; }).length;
     var alertCount = props.updates.filter(function(u){ return u.category==='Safety' && u.is_verified; }).length;
     var pendingCount = props.updates.filter(function(u){ return !u.is_verified; }).length;
+    var latestVerified = props.updates.filter(function(u){ return u.is_verified; }).slice(0,3);
     
     return html`
       <div className="px-4 pb-6 space-y-6">
