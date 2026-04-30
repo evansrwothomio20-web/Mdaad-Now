@@ -73,7 +73,52 @@ class Resource(Base):
     name = Column(String(150))
     category = Column(String(50)) # ngo, hospital, shelter
     address = Column(String(200))
-    stock_level = Column(Integer, default=100) # Percentage (0-100)
-    wishlist = Column(JSON, nullable=True) # Array of items
+    description = Column(Text, nullable=True)
+    stock_level = Column(Integer, default=100) 
+    wishlist = Column(JSON, nullable=True) 
     is_critically_low = Column(Boolean, default=False)
+    
+    # Organization/Trust Fields
+    verification_status = Column(String(50), default="verified")
+    trust_score = Column(Integer, default=70)
+    docs_submitted = Column(Boolean, default=True)
+    un_ocha_registered = Column(Boolean, default=False)
+    has_field_contact = Column(Boolean, default=True)
+    community_reports = Column(Integer, default=0)
+    campaigns_fulfilled = Column(Integer, default=0)
+    days_active = Column(Integer, default=1)
+    
     last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    campaigns = relationship("Campaign", back_populates="organization")
+
+class Campaign(Base):
+    __tablename__ = "campaigns"
+
+    id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("resources.id"))
+    posted_by = Column(String(100), nullable=True)
+
+    title = Column(String(150), nullable=False)
+    description = Column(Text, nullable=False)
+    category = Column(String(50), nullable=False) # Food, Health, etc.
+
+    urgency_level = Column(String(20), default="Medium")
+    status = Column(String(20), default="active") # active, fulfilled, expired
+
+    location_coords = Column(JSON, nullable=True)
+    location_label = Column(String(150), nullable=True)
+    is_location_masked = Column(Boolean, default=False)
+
+    quantity_needed = Column(Integer, nullable=True)
+    quantity_unit = Column(String(20), default="units")
+    quantity_fulfilled = Column(Integer, default=0)
+    
+    volunteer_slots = Column(Integer, default=0)
+    volunteers_claimed = Column(Integer, default=0)
+
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    organization = relationship("Resource", back_populates="campaigns")

@@ -1,18 +1,38 @@
 tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            terracotta: { DEFAULT:'#D27D56', light:'#E8A882', dark:'#B8654A', '50':'#FEF5F0' },
-            cream: { DEFAULT:'#FFF8F0', dark:'#F0E4D7', darker:'#E2D1BF' },
-            bark: { DEFAULT:'#2D1B0E', light:'#6B5344', lighter:'#9C8577' },
-            verified: '#2D7A3A',
-            pending: '#C4960C',
-            unverified: '#B83B2E',
+    theme: {
+      extend: {
+        colors: {
+          navy: {
+            DEFAULT: '#1A365D',
+            light: '#2A4365',
+            dark: '#102A43',
           },
-          fontFamily: {
-            serif: ['DM Serif Display','Georgia','serif'],
-            sans: ['DM Sans','system-ui','sans-serif'],
+          actionOrange: {
+            DEFAULT: '#C2410C',
+            light: '#EA580C',
+            dark: '#9A3412',
           },
+          tealAccent: {
+            DEFAULT: '#0D9488',
+            light: '#14B8A6',
+            dark: '#0F766E',
+          },
+          coolGray: '#F8FAFC',
+          verified: '#0D9488',
+          pending: '#C4960C',
+          unverified: '#B83B2E',
         },
+        fontFamily: {
+          serif: ['Playfair Display', 'serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          kufi: ['Readex Pro', 'sans-serif'],
+        },
+        boxShadow: {
+          'premium': '10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.05)',
+        },
+        borderRadius: {
+          'premium': '16px',
+        }
       },
+    },
     };
