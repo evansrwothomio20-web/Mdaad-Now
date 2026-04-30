@@ -553,6 +553,132 @@
     `;
   }
 
+ 
+  // =========================================================
+  // BRIEF CARD COMPONENT
+  // =========================================================
+  function BriefCard({ title, titleAr, items, color }) {
+    return html`
+      <div className="bg-white rounded-premium shadow-premium border-l-[4px] p-5 fade-up" style=${{ borderLeftColor: color }}>
+        <div className="mb-4">
+          <h3 className="text-sm font-bold text-navy uppercase tracking-wider">${title}</h3>
+          <p className="text-[10px] font-kufi text-slate-400 mt-0.5">${titleAr}</p>
+        </div>
+        <div className="space-y-4">
+          ${items.map(item => html`
+            <div key=${item.en} className="group cursor-default hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors">
+              <div className="flex gap-4">
+                <div className="mt-1">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-all bg-slate-50 group-hover:bg-white shadow-sm">
+                    <i className=${`fa-solid ${item.icon} text-[10px]`} style=${{ color: color }}></i>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-[12px] font-bold text-navy leading-tight">${item.en}</div>
+                  <div className="text-[11px] font-kufi text-slate-500 mt-1 leading-snug">${item.ar}</div>
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5 transition-all group-hover:bg-navy/5 group-hover:text-navy cursor-pointer border border-transparent group-hover:border-navy/10">
+                      ${item.source} <i className="fa-solid fa-arrow-up-right-from-square text-[6px]"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `)}
+        </div>
+      </div>
+    `;
+  }
+
+  function BilingualBriefing() {
+    const protectionRisks = [
+      { 
+        en: 'Civil Documentation & Identity Verification', 
+        ar: 'الوثائق الثبوتية والتحقق من الهوية', 
+        icon: 'fa-id-card', 
+        source: 'UNHCR'
+      },
+      { 
+        en: 'Residency Status & Legal Eligibility', 
+        ar: 'وضع الإقامة والأهلية القانونية', 
+        icon: 'fa-user-shield', 
+        source: 'IOM'
+      },
+      { 
+        en: 'Gender-Based Violence (GBV) Protection', 
+        ar: 'الحماية من العنف القائم على النوع الاجتماعي', 
+        icon: 'fa-shield-heart', 
+        source: 'UNFPA'
+      }
+    ];
+
+    const operationalGuidance = [
+      { 
+        en: 'Coordinate, Do Not Duplicate', 
+        ar: 'التنسيق وعدم التكرار', 
+        icon: 'fa-arrows-to-circle', 
+        source: 'OCHA'
+      },
+      { 
+        en: 'Defer to Local Actors', 
+        ar: 'إعطاء الأولوية للجهات الفاعلة المحلية', 
+        icon: 'fa-people-group', 
+        source: 'Red Crescent'
+      },
+      { 
+        en: 'Verify Before Sharing', 
+        ar: 'التحقق قبل المشاركة', 
+        icon: 'fa-check-double', 
+        source: 'Mdaad Admin'
+      }
+    ];
+
+    const legalContext = [
+      { 
+        en: 'Temporary Protection Visas', 
+        ar: 'تأشيرات الحماية المؤقتة', 
+        icon: 'fa-file-signature', 
+        source: 'MOI'
+      },
+      { 
+        en: 'Access to Legal Aid', 
+        ar: 'الوصول إلى المساعدة القانونية', 
+        icon: 'fa-scale-balanced', 
+        source: 'BAR Association'
+      }
+    ];
+
+    return html`
+      <div className="space-y-6 fade-up fade-up-delay-2">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-bold text-navy uppercase tracking-tight">What Helpers Should Know</h2>
+          <p className="text-[11px] font-kufi text-slate-400">ما يجب أن يعرفه المتطوعون والمنسقون</p>
+        </div>
+
+        <${BriefCard} 
+          title="Protection Risks" 
+          titleAr="مخاطر الحماية" 
+          color="#C2410C" 
+          items=${protectionRisks} 
+        />
+
+        <${BriefCard} 
+          title="Operational Guidance" 
+          titleAr="التوجيه العملياتي" 
+          color="#0D9488" 
+          items=${operationalGuidance} 
+        />
+
+        <${BriefCard} 
+          title="Legal Context" 
+          titleAr="السياق القانوني" 
+          color="#0D9488" 
+          items=${legalContext} 
+        />
+      </div>
+    `;
+  }
+
   // =========================================================
   // RESOURCE CARD
   // =========================================================
@@ -795,6 +921,9 @@
           </button>
         </div>
 
+        <!-- Humanitarian Briefing -->
+        <${BilingualBriefing} />
+
         <!-- Latest verified updates -->
         <div className="fade-up fade-up-delay-3">
           <div className="flex items-center justify-between mb-3">
@@ -810,6 +939,25 @@
             ${latestVerified.length === 0 ? html`
               <div className="text-center py-8 text-bark-lighter text-sm">No verified updates yet</div>
             ` : null}
+          </div>
+        </div>
+
+        <!-- Neutrality Note -->
+        <div className="fade-up fade-up-delay-4 bg-[#F1F5F9] rounded-premium p-6 border border-slate-200">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm flex-shrink-0">
+              <i className="fa-solid fa-circle-info"></i>
+            </div>
+            <div>
+              <div className="flex flex-col text-left">
+                <h3 className="text-sm font-bold text-navy uppercase tracking-wider leading-none">A note on neutrality</h3>
+                <p className="text-[10px] font-kufi text-slate-400 mt-1.5 opacity-80">ملاحظة حول الحياد</p>
+              </div>
+              <div className="space-y-3 mt-4 text-left">
+                <p className="text-[11px] text-slate-600 leading-relaxed font-medium">Mdaad Now is a strictly neutral humanitarian coordination tool. All data is verified based on need alone, without political or sectarian affiliation.</p>
+                <p className="text-[10px] font-kufi text-slate-500 leading-relaxed">نظام مدد هو أداة تنسيق إنسانية محايدة تماماً. يتم التحقق من جميع البيانات بناءً على الاحتياج فقط، دون أي انتماء سياسي أو طائفي.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
