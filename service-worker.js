@@ -6,8 +6,8 @@
 //   Supabase REST   → Stale-While-Revalidate
 //   Supabase Auth   → Network-only (never cache tokens)
 // ============================================================
-const CACHE_VERSION = 'mdaad-now-v2';
-const DATA_CACHE    = 'mdaad-data-v2';
+const CACHE_VERSION = 'mdaad-now-v3';
+const DATA_CACHE    = 'mdaad-data-v3';
 
 const STATIC_ASSETS = [
   '/',
@@ -22,7 +22,7 @@ const STATIC_ASSETS = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js',
-  'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Readex+Pro:wght@300;400;500;600&display=swap',
 ];
 
 // ── Install: pre-cache all static assets ───────────────────
