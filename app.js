@@ -863,7 +863,7 @@
       <div className="px-4 pb-6 space-y-6">
         <!-- Greeting -->
         <div className="fade-up pt-4">
-          <h1 className="text-3xl font-bold text-navy leading-tight">Welcome back, Civilian</h1>
+          <h1 className="text-3xl font-bold text-navy leading-tight">Welcome back</h1>
           <p className="text-sm font-kufi text-slate-400 mt-1 opacity-80 font-medium">مرحباً بك مجدداً</p>
         </div>
 
