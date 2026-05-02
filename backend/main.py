@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
-from . import models, database, reliefweb, hdx_hapi
+from . import models, database, reliefweb, hdx_hapi, unhcr
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
@@ -212,3 +212,8 @@ def get_hdx_presence(location: str = "Lebanon", admin_level: int = 0):
 def get_hdx_funding(location: str = "Lebanon"):
     """Fetch funding status from HDX HAPI."""
     return hdx_hapi.fetch_hdx_funding(location=location)
+
+@app.get("/api/external/unhcr/population")
+def get_unhcr_population(coa: str = "LBN", year: int = 2023):
+    """Fetch refugee population statistics from UNHCR."""
+    return unhcr.fetch_unhcr_population(coa=coa, year=year)

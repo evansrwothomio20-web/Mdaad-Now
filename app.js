@@ -1360,10 +1360,44 @@
     return html`
       <div className="px-4 pb-6 space-y-6">
         <div className="fade-up pt-4">
-          <h1 className="text-3xl font-bold text-navy">Briefs</h1>
+          <h1 className="text-3xl font-bold text-navy">Country Briefs</h1>
           <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">
-            ${canApprove ? 'Review and verify incoming reports / مراجعة التقارير الواردة' : 'Verified humanitarian intelligence / معلومات إنسانية موثقة'}
+            Official displacement statistics and humanitarian intelligence / معلومات إنسانية وإحصاءات رسمية
           </p>
+        </div>
+
+        <!-- Population at Risk Visualization -->
+        <div className="fade-up fade-up-delay-1 bg-white p-6 rounded-premium border border-slate-100 shadow-premium">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-sm font-black text-navy uppercase tracking-widest">Population at Risk</h3>
+              <p className="text-[10px] font-kufi text-slate-400">سياق النزوح وحالات اللجوء</p>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Country of Asylum: Lebanon</span>
+              <span className="text-[8px] font-black text-tealAccent uppercase tracking-widest mt-1">Source: UNHCR Refugee Statistics</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${(props.unhcrData || []).map(function(item) {
+              return html`
+                <div key=${item.coo} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black text-navy uppercase tracking-widest">${item.coo}</span>
+                    <span className="text-[9px] font-kufi text-slate-400 mt-0.5">بلد المنشأ / Country of Origin</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-lg font-black text-navy">${item.total.toLocaleString()}</span>
+                    <span className="text-[9px] font-kufi text-slate-400 mt-0.5">إجمالي النازحين / Total Displaced</span>
+                  </div>
+                </div>
+              `;
+            })}
+            ${(!props.unhcrData || props.unhcrData.length === 0) && html`
+              <div className="col-span-full text-center py-8 text-slate-300 text-[10px] uppercase tracking-widest font-black">Loading displacement context...</div>
+            `}
+          </div>
         </div>
 
         <!-- Role indicator -->
@@ -2069,6 +2103,7 @@
     var [externalAlertCount, setExternalAlertCount] = React.useState(0);
     var [hdxPresence, setHdxPresence] = React.useState(null);
     var [hdxFunding, setHdxFunding] = React.useState(null);
+    var [unhcrData, setUnhcrData] = React.useState([]);
 
     // NGO Org profile (demo — replace with Supabase auth user's org)
     const MOCK_NGO_ORG = {
@@ -2144,6 +2179,13 @@
         apiFetch('/external/hdx/funding').then(function(data){
           if (data && data.percent !== undefined) {
              setHdxFunding(data);
+          }
+        });
+
+        // Fetch UNHCR population data
+        apiFetch('/external/unhcr/population').then(function(data){
+          if (data && Array.isArray(data)) {
+             setUnhcrData(data);
           }
         });
 
@@ -2302,7 +2344,14 @@
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
           ${tab==='volunteer' && html`<${VolunteerView} updates=${updates} user=${user} />`}
           ${tab==='resources' && html`<${ResourcesView} resources=${resources} user=${user} />`}
-          ${tab==='briefs' && html`<${BriefsView} user=${user} updates=${updates} onVerify=${handleVerify} onReject=${handleReject} onSuggest=${function(){ setShowSuggest(true); }} />`}
+          ${tab==='briefs' && html`<${BriefsView} 
+            user=${user} 
+            updates=${updates} 
+            unhcrData=${unhcrData}
+            onVerify=${handleVerify} 
+            onReject=${handleReject} 
+            onSuggest=${function(){ setShowSuggest(true); }} 
+          />`}
           ${tab==='ngo' && (org ? html`<${NGODashboardView}
             org=${org}
             campaigns=${orgCampaigns}
