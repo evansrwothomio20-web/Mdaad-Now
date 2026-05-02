@@ -1007,8 +1007,7 @@
     var markersRef = useRef([]);
     var updatesRef = useState([]);
     var updates = updatesRef[0], setUpdates = updatesRef[1];
-    var filterRef = useState('all');
-    var mapFilter = filterRef[0], setMapFilter = filterRef[1];
+    var [mapFilter, setMapFilter] = useState('all');
 
     var hotProjectsRef = useState([]);
     var hotProjects = hotProjectsRef[0], setHotProjects = hotProjectsRef[1];
@@ -2512,20 +2511,19 @@
   async function apiFetch(endpoint, options = {}) {
     if (navigator.onLine) {
       try {
-        const response = await fetch(`${API_BASE}${endpoint}`, options);
-        if (!response.ok) throw new Error('API offline');
+        const url = `${API_BASE}${endpoint}`;
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error('API_ERROR');
         return await response.json();
       } catch (err) {
-        console.warn('Backend unreachable, attempting direct fetch fallback for:', endpoint);
-        // Fallback for external APIs if backend is down (e.g. on GitHub Pages)
+        console.warn('Backend connection issue:', err);
         if (endpoint.startsWith('/external/')) {
-          const fallbackData = await fetchExternalDirectly(endpoint);
-          if (fallbackData) return fallbackData;
+          const fb = await fetchExternalDirectly(endpoint);
+          if (fb) return fb;
         }
         return queueOfflineRequest(endpoint, options);
       }
     } else {
-      console.log('Offline, queueing request');
       return queueOfflineRequest(endpoint, options);
     }
   }

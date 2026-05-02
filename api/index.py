@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
-from . import models, database, reliefweb, hdx_hapi, unhcr, hot_osm
+import models, database, reliefweb, hdx_hapi, unhcr, hot_osm
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
