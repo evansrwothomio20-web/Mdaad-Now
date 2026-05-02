@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
-from . import models, database, reliefweb
+from . import models, database, reliefweb, hdx_hapi
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
@@ -202,3 +202,13 @@ def get_disasters_count():
     """Fetch active disasters count from ReliefWeb."""
     count = reliefweb.fetch_active_disasters_count()
     return {"count": count}
+
+@app.get("/api/external/hdx/presence")
+def get_hdx_presence(location: str = "Lebanon", admin_level: int = 0):
+    """Fetch operational presence from HDX HAPI."""
+    return hdx_hapi.fetch_hdx_presence(location=location, admin_level=admin_level)
+
+@app.get("/api/external/hdx/funding")
+def get_hdx_funding(location: str = "Lebanon"):
+    """Fetch funding status from HDX HAPI."""
+    return hdx_hapi.fetch_hdx_funding(location=location)

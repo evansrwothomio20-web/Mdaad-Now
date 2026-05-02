@@ -862,9 +862,10 @@
   // HOME VIEW
   // =========================================================
   function HomeView(props) {
-    var verifiedCount = props.resources.filter(function(r){ return r.verification_status==='verified'; }).length;
-    var alertCount = props.externalAlertCount || props.updates.filter(function(u){ return u.category==='Safety' && u.is_verified; }).length;
-    var pendingCount = props.updates.filter(function(u){ return !u.is_verified; }).length;
+    var orgCount = props.hdxPresence ? props.hdxPresence.count : 0;
+    var alertCount = props.externalAlertCount || 0;
+    var fundingPercent = props.hdxFunding ? props.hdxFunding.percent : 0;
+    
     var latestVerified = props.updates.filter(function(u){ return u.is_verified; }).slice(0,3);
     
     return html`
@@ -878,24 +879,24 @@
         <!-- Stats -->
         <div className="grid grid-cols-3 gap-3 fade-up">
           <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
-            <div className="text-2xl font-bold text-tealAccent">${verifiedCount}</div>
+            <div className="text-2xl font-bold text-tealAccent">${orgCount}</div>
             <div className="flex flex-col mt-1">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Verified<br/>Resources</span>
-              <span className="text-[9px] font-kufi text-slate-400 mt-0.5">الموارد الموثقة</span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Active<br/>Orgs</span>
+              <span className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">OCHA HDX / 3W</span>
             </div>
           </div>
           <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
             <div className="text-2xl font-bold text-actionOrange">${alertCount}</div>
             <div className="flex flex-col mt-1">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Active<br/>Alerts</span>
-              <span className="text-[9px] font-kufi text-slate-400 mt-0.5">تنبيهات نشطة</span>
+              <span className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">ReliefWeb v2</span>
             </div>
           </div>
-          <div className="bg-white rounded-premium shadow-premium p-3 text-center border border-slate-50 transition-transform active:scale-95">
-            <div className="text-2xl font-bold text-amber-500">${pendingCount}</div>
+          <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
+            <div className="text-2xl font-bold text-amber-500">${fundingPercent}%</div>
             <div className="flex flex-col mt-1">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Pending<br/>Reviews</span>
-              <span className="text-[9px] font-kufi text-slate-400 mt-0.5">مراجعات معلقة</span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Funding<br/>Status</span>
+              <span className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">OCHA FTS</span>
             </div>
           </div>
         </div>
@@ -2066,6 +2067,8 @@
     var [showPostNeed, setShowPostNeed] = React.useState(false);
     
     var [externalAlertCount, setExternalAlertCount] = React.useState(0);
+    var [hdxPresence, setHdxPresence] = React.useState(null);
+    var [hdxFunding, setHdxFunding] = React.useState(null);
 
     // NGO Org profile (demo — replace with Supabase auth user's org)
     const MOCK_NGO_ORG = {
@@ -2132,6 +2135,18 @@
         } finally {
           setIsLoading(false);
         }
+        // Fetch HDX HAPI data
+        apiFetch('/external/hdx/presence').then(function(data){
+          if (data && data.count !== undefined) {
+             setHdxPresence(data);
+          }
+        });
+        apiFetch('/external/hdx/funding').then(function(data){
+          if (data && data.percent !== undefined) {
+             setHdxFunding(data);
+          }
+        });
+
       }
       initData();
     }, []);
@@ -2272,7 +2287,18 @@
 
         <!-- Tab content -->
         <main className="flex-1 overflow-y-auto tab-content" style=${{paddingTop:'16px'}}>
-          ${tab==='home' && html`<${HomeView} user=${user} updates=${updates} resources=${resources} onSuggest=${function(){ setShowSuggest(true); }} onRequestHelp=${function(){ setShowRequestHelp(true); }} onDonate=${function(){ setShowDonation(true); }} setTab=${setTab} />`}
+          ${tab==='home' && html`<${HomeView} 
+            user=${user} 
+            updates=${updates} 
+            resources=${resources} 
+            externalAlertCount=${externalAlertCount}
+            hdxPresence=${hdxPresence}
+            hdxFunding=${hdxFunding}
+            onSuggest=${function(){ setShowSuggest(true); }} 
+            onRequestHelp=${function(){ setShowRequestHelp(true); }} 
+            onDonate=${function(){ setShowDonation(true); }} 
+            setTab=${setTab} 
+          />`}
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
           ${tab==='volunteer' && html`<${VolunteerView} updates=${updates} user=${user} />`}
           ${tab==='resources' && html`<${ResourcesView} resources=${resources} user=${user} />`}
