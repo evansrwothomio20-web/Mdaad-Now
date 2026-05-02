@@ -2528,6 +2528,9 @@
       if (response.ok) return await response.json();
     } catch (err) {
       clearTimeout(timeoutId);
+      if (err.name === 'TypeError' || err.name === 'AbortError') {
+        showToast('Connection Timeout: Retrying direct link...', 'info');
+      }
       console.warn('Backend unavailable, using direct humanitarian data source', endpoint);
     }
 
