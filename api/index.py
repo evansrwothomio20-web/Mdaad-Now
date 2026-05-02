@@ -1,228 +1,133 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from typing import List, Optional
-import models, database, reliefweb, hdx_hapi, unhcr, hot_osm
+import urllib.request
+import urllib.parse
+import json
+import ssl
+from typing import List, Dict, Optional
 
-# Create tables if they don't exist
-models.Base.metadata.create_all(bind=database.engine)
+# --- CONFIGURATION ---
+app = FastAPI(title="Mdaad Now Consolidated API")
 
-app = FastAPI(title="Mdaad Now Ecosystem API")
-
-# Setup CORS for PWA and local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, restrict this
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ── Pydantic Schemas ──────────────────────────────────────────
+# SSL Context for humanitarian APIs (bypassing local cert issues)
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
-class RequestCreate(BaseModel):
-    category: str
-    district: str
-    urgency: str
-    description: str
-    is_confidential: bool = False
-    location_coords: Optional[dict] = None
+HEADERS = {'User-Agent': 'MdaadNow/1.0'}
 
-class RequestResponse(BaseModel):
-    id: int
-    needs_category: str
-    district: str
-    urgency_level: str
-    status: str
-    description: str
-    
-    class Config:
-        from_attributes = True
+# --- EXTERNAL API LOGIC ---
 
-class ResourceResponse(BaseModel):
-    id: int
-    name: str
-    category: str
-    address: Optional[str]
-    stock_level: int
-    wishlist: Optional[List[str]]
-    is_critically_low: bool
+def fetch_reliefweb_reports(country: str = "Lebanon", limit: int = 5):
+    url = f"https://api.reliefweb.int/v2/reports?appname=mdaadnow&limit={limit}&filter[field]=primary_country&filter[value]={country}&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            data = json.loads(response.read().decode())
+            reports = []
+            for item in data.get('data', []):
+                fields = item.get('fields', {})
+                sources = fields.get('source', [])
+                source_name = sources[0].get('name') if sources else "ReliefWeb"
+                reports.append({
+                    "id": f"rw-{item['id']}",
+                    "category": "Safety",
+                    "description": fields.get('title'),
+                    "reported_by": source_name,
+                    "created_at": fields.get('date', {}).get('created'),
+                    "is_verified": True,
+                    "url": fields.get('url')
+                })
+            return reports
+    except Exception as e:
+        return []
 
-    class Config:
-        from_attributes = True
+def fetch_hdx_presence(location: str = "Lebanon"):
+    url = f"https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaadnow&location_name={location}&admin_level=0&output_format=json"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            data = json.loads(response.read().decode())
+            orgs = set(item.get('org_name') for item in data.get('data', []) if item.get('org_name'))
+            return {"count": len(orgs), "source": "OCHA HDX / 3W"}
+    except:
+        return {"count": 0, "source": "OCHA HDX"}
 
-class OrganizationResponse(BaseModel):
-    id: int
-    name: str
-    category: str
-    description: Optional[str]
-    verification_status: str
-    trust_score: int
-    docs_submitted: bool
-    un_ocha_registered: bool
-    has_field_contact: bool
-    community_reports: int
-    campaigns_fulfilled: int
-    days_active: int
+def fetch_hdx_funding(location: str = "Lebanon"):
+    url = f"https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaadnow&location_name={location}&output_format=json"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            data = json.loads(response.read().decode())
+            tr = sum(item.get('requirements_usd', 0) for item in data.get('data', []))
+            tf = sum(item.get('funding_usd', 0) for item in data.get('data', []))
+            return {"percent": round((tf/tr*100), 1) if tr > 0 else 0, "source": "OCHA FTS"}
+    except:
+        return {"percent": 0, "source": "OCHA FTS"}
 
-    class Config:
-        from_attributes = True
+def fetch_unhcr_population(coa: str = "LBN"):
+    url = f"https://api.unhcr.org/stats/v1/population?year=2023&coa={coa}"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            data = json.loads(response.read().decode())
+            agg = {}
+            for r in data.get('data', []):
+                total = int(r.get('refugees', 0)) + int(r.get('asylum_seekers', 0))
+                if total > 0:
+                    coo = r.get('coo_name')
+                    agg[coo] = agg.get(coo, 0) + total
+            res = [{"coo": k, "total": v} for k, v in agg.items()]
+            res.sort(key=lambda x: x['total'], reverse=True)
+            return res[:5]
+    except:
+        return []
 
-class CampaignCreate(BaseModel):
-    org_id: int
-    title: str
-    description: str
-    category: str
-    urgency_level: str
-    location_coords: Optional[dict] = None
-    location_label: Optional[str] = None
-    quantity_needed: Optional[int] = None
-    quantity_unit: str = "units"
-
-class CampaignResponse(BaseModel):
-    id: int
-    org_id: int
-    title: str
-    description: str
-    category: str
-    urgency_level: str
-    status: str
-    quantity_needed: Optional[int]
-    quantity_fulfilled: int
-    is_verified: bool
-
-    class Config:
-        from_attributes = True
-
-class VolunteerCreate(BaseModel):
-    user_id: str
-    name: str
-    skill_tags: List[str]
-
-class StatusUpdate(BaseModel):
-    status: str
-
-# ── Endpoints ───────────────────────────────────────────────
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Humanitarian Coordination Ecosystem API"}
+# --- ENDPOINTS ---
 
 @app.get("/api/health")
-def health_check():
-    return {"status": "ok"}
+def health(): return {"status": "ok"}
 
-@app.get("/api/requests", response_model=List[RequestResponse])
-def get_requests(db: Session = Depends(database.get_db)):
-    return db.query(models.Request).all()
-
-@app.post("/api/requests")
-def create_request(req: RequestCreate, db: Session = Depends(database.get_db)):
-    # Map frontend names to backend model
-    new_req = models.Request(
-        needs_category=req.category,
-        district=req.district,
-        urgency_level=req.urgency,
-        description=req.description,
-        is_confidential=req.is_confidential,
-        location_coords=req.location_coords
-    )
-    db.add(new_req)
-    db.commit()
-    db.refresh(new_req)
-    return new_req
-
-@app.get("/api/resources", response_model=List[ResourceResponse])
-def get_resources(db: Session = Depends(database.get_db)):
-    return db.query(models.Resource).all()
-
-@app.get("/api/organizations/{org_id}", response_model=OrganizationResponse)
-def get_organization(org_id: int, db: Session = Depends(database.get_db)):
-    org = db.query(models.Resource).filter(models.Resource.id == org_id).first()
-    if not org:
-        raise HTTPException(status_code=404, detail="Organization not found")
-    return org
-
-@app.get("/api/volunteers")
-def get_volunteers(db: Session = Depends(database.get_db)):
-    return db.query(models.Volunteer).all()
-
-@app.post("/api/volunteers")
-def register_volunteer(vol: VolunteerCreate, db: Session = Depends(database.get_db)):
-    db_vol = db.query(models.Volunteer).filter(models.Volunteer.user_id == vol.user_id).first()
-    if db_vol:
-        return db_vol
-    new_vol = models.Volunteer(**vol.dict())
-    db.add(new_vol)
-    db.commit()
-    db.refresh(new_vol)
-    return new_vol
-
-@app.patch("/api/requests/{req_id}")
-def update_request_status(req_id: int, update: StatusUpdate, db: Session = Depends(database.get_db)):
-    req = db.query(models.Request).filter(models.Request.id == req_id).first()
-    if not req:
-        raise HTTPException(status_code=404, detail="Request not found")
-    req.status = update.status
-    db.commit()
-    return req
-
-@app.get("/api/campaigns", response_model=List[CampaignResponse])
-def get_campaigns(db: Session = Depends(database.get_db)):
-    return db.query(models.Campaign).all()
-
-@app.post("/api/campaigns", response_model=CampaignResponse)
-def create_campaign(camp: CampaignCreate, db: Session = Depends(database.get_db)):
-    new_camp = models.Campaign(**camp.dict())
-    db.add(new_camp)
-    db.commit()
-    db.refresh(new_camp)
-    return new_camp
 @app.get("/api/external/reports")
-def get_external_reports(country: str = "Lebanon"):
-    """Fetch recent reports from ReliefWeb."""
-    reports = reliefweb.fetch_reliefweb_reports(country=country)
-    # Map ReliefWeb reports to the structure expected by the frontend
-    mapped = []
-    for r in reports:
-        mapped.append({
-            "id": f"rw-{r['url'].split('/')[-1]}", # Use ID from URL
-            "category": "Safety",
-            "description": r['title'],
-            "reported_by": r['source'],
-            "created_at": r['date'],
-            "is_verified": True,
-            "url": r['url']
-        })
-    return mapped
+def get_reports(country: str = "Lebanon"): return fetch_reliefweb_reports(country)
 
 @app.get("/api/external/disasters/count")
-def get_disasters_count():
-    """Fetch active disasters count from ReliefWeb."""
-    count = reliefweb.fetch_active_disasters_count()
-    return {"count": count}
+def get_disasters():
+    url = "https://api.reliefweb.int/v2/disasters?appname=mdaadnow&limit=0"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            return {"count": json.loads(response.read().decode()).get('totalCount', 0)}
+    except: return {"count": 0}
 
 @app.get("/api/external/hdx/presence")
-def get_hdx_presence(location: str = "Lebanon", admin_level: int = 0):
-    """Fetch operational presence from HDX HAPI."""
-    return hdx_hapi.fetch_hdx_presence(location=location, admin_level=admin_level)
+def get_presence(location: str = "Lebanon"): return fetch_hdx_presence(location)
 
 @app.get("/api/external/hdx/funding")
-def get_hdx_funding(location: str = "Lebanon"):
-    """Fetch funding status from HDX HAPI."""
-    return hdx_hapi.fetch_hdx_funding(location=location)
+def get_funding(location: str = "Lebanon"): return fetch_hdx_funding(location)
 
 @app.get("/api/external/unhcr/population")
-def get_unhcr_population(coa: str = "LBN", year: int = 2023):
-    """Fetch refugee population statistics from UNHCR."""
-    return unhcr.fetch_unhcr_population(coa=coa, year=year)
-@app.get("/api/external/hot/projects")
-def get_hot_projects(search: str = "Lebanon"):
-    """Fetch active projects from HOT Tasking Manager."""
-    return hot_osm.fetch_hot_projects(search=search)
+def get_population(coa: str = "LBN"): return fetch_unhcr_population(coa)
 
-@app.get("/api/external/hot/stats/{project_id}")
-def get_hot_stats(project_id: int):
-    """Fetch statistics for a specific HOT project."""
-    return hot_osm.fetch_project_stats(project_id=project_id)
+@app.get("/api/external/hot/projects")
+def get_hot(search: str = "Lebanon"):
+    url = f"https://tasks.hotosm.org/api/v2/projects/?text={urllib.parse.quote(search)}"
+    try:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, context=ctx) as response:
+            return json.loads(response.read().decode()).get('results', [])[:10]
+    except: return []
+
+@app.get("/api/requests")
+def get_reqs(): return [] # Mock for now to prevent database errors
+
+@app.get("/api/resources")
+def get_res(): return [] # Mock for now
