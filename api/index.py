@@ -36,10 +36,10 @@ def safe_fetch(url: str):
         print(f"Fetch Error [{url}]: {e}")
         return None
 
-@app.get("/api/health")
+@app.get("/health")
 def health(): return {"status": "online", "environment": "production"}
 
-@app.get("/api/external/reports")
+@app.get("/external/reports")
 def get_reports(country: str = "Lebanon"):
     data = safe_fetch(f"https://api.reliefweb.int/v2/reports?appname=mdaad&limit=5&filter[field]=primary_country&filter[value]={country}&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date")
     if not data: return []
@@ -53,19 +53,19 @@ def get_reports(country: str = "Lebanon"):
         "url": item['fields'].get('url')
     } for item in data.get('data', [])]
 
-@app.get("/api/external/disasters/count")
+@app.get("/external/disasters/count")
 def get_disasters():
     data = safe_fetch("https://api.reliefweb.int/v2/disasters?appname=mdaad&limit=0&preset=external")
     return {"count": data.get('totalCount', 0) if data else 0}
 
-@app.get("/api/external/hdx/presence")
+@app.get("/external/hdx/presence")
 def get_presence(location: str = "Lebanon"):
     data = safe_fetch(f"https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaad&location_name={location}&admin_level=0&output_format=json")
     if not data: return {"count": 0, "source": "OCHA HDX"}
     orgs = set(i.get('org_name') for i in data.get('data', []) if i.get('org_name'))
     return {"count": len(orgs), "source": "OCHA HDX / 3W"}
 
-@app.get("/api/external/hdx/funding")
+@app.get("/external/hdx/funding")
 def get_funding(location: str = "Lebanon"):
     data = safe_fetch(f"https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaad&location_name={location}&output_format=json")
     if not data: return {"percent": 0, "source": "OCHA FTS"}
@@ -73,7 +73,7 @@ def get_funding(location: str = "Lebanon"):
     tf = sum(i.get('funding_usd', 0) for i in data.get('data', []))
     return {"percent": round((tf/tr*100), 1) if tr > 0 else 0, "source": "OCHA FTS"}
 
-@app.get("/api/external/unhcr/population")
+@app.get("/external/unhcr/population")
 def get_population(coa: str = "LBN"):
     data = safe_fetch(f"https://api.unhcr.org/stats/v1/population?year=2023&coa={coa}")
     if not data: return []
@@ -86,16 +86,16 @@ def get_population(coa: str = "LBN"):
     res = sorted([{"coo": k, "total": v} for k, v in agg.items()], key=lambda x: x['total'], reverse=True)
     return res[:5]
 
-@app.get("/api/external/hot/projects")
+@app.get("/external/hot/projects")
 def get_hot(search: str = "Lebanon"):
     data = safe_fetch(f"https://tasks.hotosm.org/api/v2/projects/?text={urllib.parse.quote(search)}")
     return (data.get('results', []) if data else [])[:10]
 
-@app.get("/api/requests")
+@app.get("/requests")
 def get_reqs(): return []
-@app.get("/api/resources")
+@app.get("/resources")
 def get_res(): return []
-@app.get("/api/campaigns")
+@app.get("/campaigns")
 def get_campaigns(): return []
-@app.get("/api/updates")
+@app.get("/updates")
 def get_updates(): return []
