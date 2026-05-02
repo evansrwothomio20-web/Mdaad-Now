@@ -531,11 +531,19 @@
         </div>
         <p className="text-[15px] font-medium text-slate-700 mt-4 leading-relaxed relative z-10">${u.description}</p>
         <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-50 relative z-10">
-          <div className="flex flex-col">
-            <span className="text-[11px] text-slate-400 font-medium">By ${u.reported_by}</span>
-            <span className="text-[9px] font-kufi text-slate-300">بواسطة ${u.reported_by}</span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] text-slate-400">By ${u.reported_by}</span>
+            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+            <span className="text-[11px] text-slate-400">${timeAgo(u.created_at)}</span>
+            ${u.url && html`
+              <>
+                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                <a href="${u.url}" target="_blank" rel="noopener noreferrer" className="text-[11px] text-tealAccent hover:underline font-bold">
+                  View Source <i className="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5"></i>
+                </a>
+              </>
+            `}
           </div>
-          <span className="text-[11px] text-slate-400">${timeAgo(u.created_at)}</span>
         </div>
         ${props.showActions && !u.is_verified ? html`
           <div className="flex gap-2 mt-4">
@@ -855,7 +863,7 @@
   // =========================================================
   function HomeView(props) {
     var verifiedCount = props.resources.filter(function(r){ return r.verification_status==='verified'; }).length;
-    var alertCount = props.updates.filter(function(u){ return u.category==='Safety' && u.is_verified; }).length;
+    var alertCount = props.externalAlertCount || props.updates.filter(function(u){ return u.category==='Safety' && u.is_verified; }).length;
     var pendingCount = props.updates.filter(function(u){ return !u.is_verified; }).length;
     var latestVerified = props.updates.filter(function(u){ return u.is_verified; }).slice(0,3);
     
@@ -996,8 +1004,11 @@
     var mapContainer = useRef(null);
     var mapInstance = useRef(null);
     var markersRef = useRef([]);
-    var filterRef = useState('all');
-    var mapFilter = filterRef[0], setMapFilter = filterRef[1];
+    var updatesRef = useState([]);
+    var updates = updatesRef[0], setUpdates = updatesRef[1];
+
+    var externalAlertCountRef = useState(0);
+    var externalAlertCount = externalAlertCountRef[0], setExternalAlertCount = externalAlertCountRef[1];
 
     useEffect(function() {
       if (!mapContainer.current || mapInstance.current) return;
@@ -2048,9 +2059,13 @@
 
     var [resources, setResources] = React.useState([]);
     var [updates, setUpdates] = React.useState([]);
+    var [campaigns, setCampaigns] = React.useState([]);
+    var [requests, setRequests] = React.useState([]);
     var [isLoading, setIsLoading] = React.useState(true);
 
     var [showPostNeed, setShowPostNeed] = React.useState(false);
+    
+    var [externalAlertCount, setExternalAlertCount] = React.useState(0);
 
     // NGO Org profile (demo — replace with Supabase auth user's org)
     const MOCK_NGO_ORG = {
@@ -2067,14 +2082,15 @@
     React.useEffect(() => {
       async function initData() {
         try {
-          const [resData, reqData] = await Promise.all([
+          const [resData, reqData, campData] = await Promise.all([
             apiFetch('/resources'),
-            apiFetch('/requests')
+            apiFetch('/requests'),
+            apiFetch('/campaigns')
           ]);
           
-          // Handle cases where data might be a queued object or null
           const safeReqData = Array.isArray(reqData) ? reqData : [];
           const safeResData = Array.isArray(resData) ? resData : [];
+          const safeCampData = Array.isArray(campData) ? campData : [];
 
           // Transform backend requests into the frontend "updates" format
           const feedUpdates = safeReqData.map(r => ({
@@ -2085,16 +2101,34 @@
             district: r.district,
             urgency: r.urgency_level,
             status: r.status,
-            is_verified: true, // Backend requests are typically verified/official
+            is_verified: true,
             reported_by: r.reported_by || 'System',
             reporter_role: 'verified_org'
           }));
 
           setResources(safeResData);
+          setCampaigns(safeCampData);
           setUpdates(feedUpdates);
+
+          // Fetch external updates from ReliefWeb and prepend them
+          apiFetch('/external/reports').then(function(externalData){
+            if (externalData && Array.isArray(externalData)) {
+              setUpdates(function(prev){
+                var existing = prev.filter(function(u){ return !u.id.toString().startsWith('rw-'); });
+                return [...externalData, ...existing];
+              });
+            }
+          });
+
+          // Fetch external disasters count
+          apiFetch('/external/disasters/count').then(function(data){
+            if (data && data.count !== undefined) {
+               setExternalAlertCount(data.count);
+            }
+          });
+
         } catch (err) {
           console.error('Failed to fetch initial data', err);
-          showToast('Running in offline/cache mode', 'info');
         } finally {
           setIsLoading(false);
         }

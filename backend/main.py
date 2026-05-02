@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
-from . import models, database
+from . import models, database, reliefweb
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
@@ -179,3 +179,26 @@ def create_campaign(camp: CampaignCreate, db: Session = Depends(database.get_db)
     db.commit()
     db.refresh(new_camp)
     return new_camp
+@app.get("/api/external/reports")
+def get_external_reports(country: str = "Lebanon"):
+    """Fetch recent reports from ReliefWeb."""
+    reports = reliefweb.fetch_reliefweb_reports(country=country)
+    # Map ReliefWeb reports to the structure expected by the frontend
+    mapped = []
+    for r in reports:
+        mapped.append({
+            "id": f"rw-{r['url'].split('/')[-1]}", # Use ID from URL
+            "category": "Safety",
+            "description": r['title'],
+            "reported_by": r['source'],
+            "created_at": r['date'],
+            "is_verified": True,
+            "url": r['url']
+        })
+    return mapped
+
+@app.get("/api/external/disasters/count")
+def get_disasters_count():
+    """Fetch active disasters count from ReliefWeb."""
+    count = reliefweb.fetch_active_disasters_count()
+    return {"count": count}
