@@ -1012,15 +1012,10 @@
     var [hotProjects, setHotProjects] = useState([]);
 
     useEffect(function() {
-      // Direct fetch for HOT projects to ensure map panel works immediately
-      const fetchHot = async () => {
-        try {
-          const resp = await fetch('https://tasks.hotosm.org/api/v2/projects/?text=Lebanon');
-          const data = await resp.json();
-          if (data && data.results) setHotProjects(data.results.slice(0,10));
-        } catch (e) { console.error('HOT fetch fail', e); }
-      };
-      fetchHot();
+      // Use apiFetch to bypass CORS via backend proxy
+      apiFetch('/external/hot/projects?search=Lebanon').then(function(data) {
+        if (data && Array.isArray(data)) setHotProjects(data);
+      });
     }, []);
 
     var externalAlertCountRef = useState(0);
