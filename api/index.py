@@ -95,3 +95,7 @@ def get_hot(search: str = "Lebanon"):
 def get_reqs(): return []
 @app.get("/api/resources")
 def get_res(): return []
+@app.get("/api/campaigns")
+def get_campaigns(): return []
+@app.get("/api/updates")
+def get_updates(): return []

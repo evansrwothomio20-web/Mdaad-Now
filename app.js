@@ -2584,7 +2584,7 @@
       }
       
       if (endpoint === '/external/unhcr/population') {
-        const resp = await fetch('https://api.unhcr.org/population/v1/population?year=2023&coa=LBN');
+        const resp = await fetch('https://api.unhcr.org/stats/v1/population?year=2023&coa=LBN');
         const data = await resp.json();
         const records = data.data || [];
         const agg = {};
