@@ -1009,13 +1009,18 @@
     var updates = updatesRef[0], setUpdates = updatesRef[1];
     var [mapFilter, setMapFilter] = useState('all');
 
-    var hotProjectsRef = useState([]);
-    var hotProjects = hotProjectsRef[0], setHotProjects = hotProjectsRef[1];
+    var [hotProjects, setHotProjects] = useState([]);
 
     useEffect(function() {
-      apiFetch('/external/hot/projects?search=Lebanon').then(function(data) {
-        if (data && Array.isArray(data)) setHotProjects(data);
-      });
+      // Direct fetch for HOT projects to ensure map panel works immediately
+      const fetchHot = async () => {
+        try {
+          const resp = await fetch('https://tasks.hotosm.org/api/v2/projects/?text=Lebanon');
+          const data = await resp.json();
+          if (data && data.results) setHotProjects(data.results.slice(0,10));
+        } catch (e) { console.error('HOT fetch fail', e); }
+      };
+      fetchHot();
     }, []);
 
     var externalAlertCountRef = useState(0);
@@ -1151,8 +1156,8 @@
     }, [props.updates, mapFilter]);
 
     return html`
-      <div className="relative overflow-hidden" style=${{height:'calc(100vh - 130px)'}}>
-        <div ref=${mapContainer} className="absolute inset-0 z-0"></div>
+      <div className="relative overflow-hidden w-full h-full min-h-[500px]" style=${{height:'calc(100vh - 140px)'}}>
+        <div ref=${mapContainer} id="map-root" className="absolute inset-0 z-0 bg-slate-50"></div>
 
         <!-- Crisis Mapping Panel -->
         <div className="absolute top-4 right-4 z-10 w-72 max-h-[85%] overflow-y-auto bg-white/95 backdrop-blur-md rounded-premium shadow-2xl border border-slate-100 p-5 fade-up">
@@ -2509,23 +2514,28 @@
 
   // Offline API Fetch wrapper
   async function apiFetch(endpoint, options = {}) {
-    if (navigator.onLine) {
-      try {
-        const url = `${API_BASE}${endpoint}`;
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error('API_ERROR');
-        return await response.json();
-      } catch (err) {
-        console.warn('Backend connection issue:', err);
-        if (endpoint.startsWith('/external/')) {
-          const fb = await fetchExternalDirectly(endpoint);
-          if (fb) return fb;
-        }
-        return queueOfflineRequest(endpoint, options);
-      }
-    } else {
-      return queueOfflineRequest(endpoint, options);
+    if (!navigator.onLine) return queueOfflineRequest(endpoint, options);
+    
+    // Attempt backend first with a quick timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    try {
+      const url = `${API_BASE}${endpoint}`;
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (response.ok) return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.warn('Backend unavailable, using direct humanitarian data source', endpoint);
     }
+
+    // Direct Fallback (Guaranteed to work if humanitarian APIs are up)
+    if (endpoint.startsWith('/external/')) {
+      return await fetchExternalDirectly(endpoint);
+    }
+    
+    return { error: 'Service Unavailable' };
   }
 
   async function fetchExternalDirectly(endpoint) {
