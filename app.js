@@ -2536,37 +2536,42 @@
   }
 
   async function fetchExternalDirectly(endpoint) {
-    const directHeaders = { 'User-Agent': 'MdaadNow-Coordination-Hub' };
     try {
       if (endpoint.startsWith('/external/reports')) {
-        const resp = await fetch('https://api.reliefweb.int/v2/reports?appname=mdaadnow&limit=5&filter[field]=primary_country&filter[value]=Lebanon&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date', { headers: directHeaders });
-        const data = await resp.json();
-        return (data.data || []).map(item => ({
-          id: 'rw-' + item.fields.url.split('/').pop(),
-          category: 'Safety',
-          description: item.fields.title,
-          reported_by: item.fields.source[0]?.name || 'ReliefWeb',
-          created_at: item.fields.date.created,
-          is_verified: true,
-          url: item.fields.url
-        }));
+        const resp = await fetch(`/api/humanitarian-data?type=reliefweb&country=Lebanon`);
+        return await resp.json();
+      }
+      
+      if (endpoint === '/external/unhcr/population') {
+        const resp = await fetch(`/api/humanitarian-data?type=unhcr&country=LBN`);
+        const raw = await resp.json();
+        const records = raw.data || [];
+        const agg = {};
+        records.forEach(r => {
+          const total = parseInt(r.refugees || 0) + parseInt(r.asylum_seekers || 0);
+          if (total > 0) { agg[r.coo_name] = (agg[r.coo_name] || 0) + total; }
+        });
+        return Object.entries(agg)
+          .map(([coo, total]) => ({ coo, total }))
+          .sort((a,b) => b.total - a.total)
+          .slice(0,5);
       }
       
       if (endpoint === '/external/disasters/count') {
-        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaadnow&preset=external&limit=0', { headers: directHeaders });
+        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaadnow&preset=external&limit=0');
         const data = await resp.json();
         return { count: data.totalCount || 0 };
       }
       
       if (endpoint === '/external/hdx/presence') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaadnow&location_name=Lebanon&admin_level=0&output_format=json', { headers: directHeaders });
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaadnow&location_name=Lebanon&admin_level=0&output_format=json');
         const data = await resp.json();
         const orgs = new Set((data.data || []).map(i => i.org_name).filter(Boolean));
         return { count: orgs.size, source: 'OCHA HDX / 3W' };
       }
       
       if (endpoint === '/external/hdx/funding') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaadnow&location_name=Lebanon&output_format=json', { headers: directHeaders });
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaadnow&location_name=Lebanon&output_format=json');
         const data = await resp.json();
         let totalReq = 0, totalFund = 0;
         (data.data || []).forEach(i => {
@@ -2577,33 +2582,10 @@
         return { percent: Math.round(percent * 10) / 10, source: 'OCHA FTS' };
       }
       
-      if (endpoint === '/external/unhcr/population') {
-        const resp = await fetch('https://api.unhcr.org/stats/v1/population?year=2023&coa=LBN', { headers: directHeaders });
-        const data = await resp.json();
-        const records = data.data || [];
-        const agg = {};
-        records.forEach(r => {
-          const total = parseInt(r.refugees || 0) + parseInt(r.asylum_seekers || 0);
-          if (total > 0) {
-            agg[r.coo_name] = (agg[r.coo_name] || 0) + total;
-          }
-        });
-        return Object.entries(agg)
-          .map(([coo, total]) => ({ coo, total }))
-          .sort((a,b) => b.total - a.total)
-          .slice(0,5);
-      }
-      
       if (endpoint.startsWith('/external/hot/projects')) {
         const resp = await fetch('https://tasks.hotosm.org/api/v2/projects/?text=Lebanon');
         const data = await resp.json();
         return (data.results || []).slice(0,10);
-      }
-      
-      if (endpoint.startsWith('/external/hot/stats')) {
-        const pid = endpoint.split('/').pop();
-        const resp = await fetch(`https://tasks.hotosm.org/api/v2/projects/${pid}/statistics/`);
-        return await resp.json();
       }
     } catch (err) {
       console.error('Direct fallback fetch failed:', err);
