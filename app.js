@@ -1007,6 +1007,17 @@
     var markersRef = useRef([]);
     var updatesRef = useState([]);
     var updates = updatesRef[0], setUpdates = updatesRef[1];
+    var filterRef = useState('all');
+    var mapFilter = filterRef[0], setMapFilter = filterRef[1];
+
+    var hotProjectsRef = useState([]);
+    var hotProjects = hotProjectsRef[0], setHotProjects = hotProjectsRef[1];
+
+    useEffect(function() {
+      apiFetch('/external/hot/projects?search=Lebanon').then(function(data) {
+        if (data && Array.isArray(data)) setHotProjects(data);
+      });
+    }, []);
 
     var externalAlertCountRef = useState(0);
     var externalAlertCount = externalAlertCountRef[0], setExternalAlertCount = externalAlertCountRef[1];
@@ -1141,9 +1152,64 @@
     }, [props.updates, mapFilter]);
 
     return html`
-      <div className="relative" style=${{height:'calc(100vh - 130px)'}}>
+      <div className="relative overflow-hidden" style=${{height:'calc(100vh - 130px)'}}>
+        <div ref=${mapContainer} className="absolute inset-0 z-0"></div>
+
+        <!-- Crisis Mapping Panel -->
+        <div className="absolute top-4 right-4 z-10 w-72 max-h-[85%] overflow-y-auto bg-white/95 backdrop-blur-md rounded-premium shadow-2xl border border-slate-100 p-5 fade-up">
+           <div className="flex justify-between items-center mb-6">
+             <div>
+               <h3 className="text-sm font-black text-navy uppercase tracking-widest">Crisis Mapping</h3>
+               <p className="text-[10px] font-kufi text-slate-400">التخطيط في حالات الأزمات</p>
+             </div>
+             <div className="w-8 h-8 rounded-full bg-tealAccent/10 flex items-center justify-center">
+               <i className="fa-solid fa-map-location-dot text-tealAccent"></i>
+             </div>
+           </div>
+           
+           <div className="space-y-6">
+             ${hotProjects.map(function(p) {
+               return html`
+                 <div key=${p.projectId} className="group">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-[10px] font-black text-navy uppercase leading-tight pr-2 line-clamp-2">${p.name}</span>
+                      <span className="text-[9px] font-black text-tealAccent bg-tealAccent/10 px-1.5 py-0.5 rounded">#${p.projectId}</span>
+                    </div>
+                    
+                    <div className="space-y-1.5 mb-3">
+                      <div className="flex justify-between items-center text-[9px] font-bold text-slate-400">
+                        <span>MAPPED</span>
+                        <span>${p.percentMapped}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-tealAccent transition-all duration-1000" style=${{width: p.percentMapped+'%'}}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                       <a href="https://tasks.hotosm.org/projects/${p.projectId}" target="_blank" className="flex-1 py-1.5 rounded-lg bg-navy text-white text-[9px] font-black text-center uppercase tracking-widest hover:bg-tealAccent transition-colors">Map Now</a>
+                       <a href="https://export.hotosm.org/en/v3/exports/new?tm=${p.projectId}" target="_blank" className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-400 text-[9px] font-black hover:bg-slate-50 transition-colors uppercase">Data</a>
+                    </div>
+                 </div>
+               `;
+             })}
+             ${hotProjects.length === 0 && html`
+               <div className="text-center py-4 text-slate-300 text-[10px] font-black uppercase tracking-widest">Searching active projects...</div>
+             `}
+           </div>
+           
+           <div className="mt-6 pt-6 border-t border-slate-100">
+              <h4 className="text-[10px] font-black text-navy uppercase mb-3">Offline Resources</h4>
+              <div className="flex flex-col gap-2">
+                 <a href="https://export.hotosm.org/en/v3/exports/new?search=Lebanon" target="_blank" className="py-2.5 rounded-xl bg-slate-50 text-slate-500 text-[9px] font-black text-center uppercase border border-slate-100 hover:border-tealAccent transition-colors">
+                    <i className="fa-solid fa-download mr-1.5"></i> Download Country Datasets
+                 </a>
+              </div>
+           </div>
+        </div>
+
         <!-- Filter chips -->
-        <div className="absolute top-4 left-4 right-4 z-[30] flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="absolute top-4 left-4 right-80 z-[30] flex gap-2 overflow-x-auto pb-1 no-scrollbar pr-4">
           <button onClick=${function(){ setMapFilter('all'); }}
             className=${'flex-shrink-0 flex flex-col items-center justify-center px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all backdrop-blur-md ' + (mapFilter==='all' ? 'bg-navy border-navy text-white shadow-lg shadow-navy/20' : 'bg-white/80 text-slate-400 border-slate-100')}>
             <span>All</span>
@@ -1165,7 +1231,6 @@
             `;
           })}
         </div>
-        <div ref=${mapContainer} className="w-full h-full rounded-none"></div>
       </div>
     `;
   }
@@ -2521,6 +2586,18 @@
           .map(([coo, total]) => ({ coo, total }))
           .sort((a,b) => b.total - a.total)
           .slice(0,5);
+      }
+      
+      if (endpoint.startsWith('/external/hot/projects')) {
+        const resp = await fetch('https://tasks.hotosm.org/api/v2/projects/?text=Lebanon');
+        const data = await resp.json();
+        return (data.results || []).slice(0,10);
+      }
+      
+      if (endpoint.startsWith('/external/hot/stats')) {
+        const pid = endpoint.split('/').pop();
+        const resp = await fetch(`https://tasks.hotosm.org/api/v2/projects/${pid}/statistics/`);
+        return await resp.json();
       }
     } catch (err) {
       console.error('Direct fallback fetch failed:', err);
