@@ -2448,15 +2448,84 @@
     if (navigator.onLine) {
       try {
         const response = await fetch(`${API_BASE}${endpoint}`, options);
+        if (!response.ok) throw new Error('API offline');
         return await response.json();
       } catch (err) {
-        console.warn('Network error, queueing offline request', err);
+        console.warn('Backend unreachable, attempting direct fetch fallback for:', endpoint);
+        // Fallback for external APIs if backend is down (e.g. on GitHub Pages)
+        if (endpoint.startsWith('/external/')) {
+          const fallbackData = await fetchExternalDirectly(endpoint);
+          if (fallbackData) return fallbackData;
+        }
         return queueOfflineRequest(endpoint, options);
       }
     } else {
       console.log('Offline, queueing request');
       return queueOfflineRequest(endpoint, options);
     }
+  }
+
+  async function fetchExternalDirectly(endpoint) {
+    try {
+      if (endpoint.startsWith('/external/reports')) {
+        const resp = await fetch('https://api.reliefweb.int/v2/reports?appname=mdaad_now&limit=5&filter[field]=primary_country&filter[value]=Lebanon&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date');
+        const data = await resp.json();
+        return (data.data || []).map(item => ({
+          id: 'rw-' + item.fields.url.split('/').pop(),
+          category: 'Safety',
+          description: item.fields.title,
+          reported_by: item.fields.source[0]?.name || 'ReliefWeb',
+          created_at: item.fields.date.created,
+          is_verified: true,
+          url: item.fields.url
+        }));
+      }
+      
+      if (endpoint === '/external/disasters/count') {
+        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaad_now&preset=external&limit=0');
+        const data = await resp.json();
+        return { count: data.totalCount || 0 };
+      }
+      
+      if (endpoint === '/external/hdx/presence') {
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaad_now&location_name=Lebanon&admin_level=0&output_format=json');
+        const data = await resp.json();
+        const orgs = new Set((data.data || []).map(i => i.org_name).filter(Boolean));
+        return { count: orgs.size, source: 'OCHA HDX / 3W' };
+      }
+      
+      if (endpoint === '/external/hdx/funding') {
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaad_now&location_name=Lebanon&output_format=json');
+        const data = await resp.json();
+        let totalReq = 0, totalFund = 0;
+        (data.data || []).forEach(i => {
+          totalReq += (i.requirements_usd || 0);
+          totalFund += (i.funding_usd || 0);
+        });
+        const percent = totalReq > 0 ? (totalFund / totalReq * 100) : 0;
+        return { percent: Math.round(percent * 10) / 10, source: 'OCHA FTS' };
+      }
+      
+      if (endpoint === '/external/unhcr/population') {
+        const resp = await fetch('https://api.unhcr.org/stats/v1/population?year=2023&coa=LBN');
+        const data = await resp.json();
+        const records = data.data || [];
+        const agg = {};
+        records.forEach(r => {
+          const total = parseInt(r.refugees || 0) + parseInt(r.asylum_seekers || 0);
+          if (total > 0) {
+            agg[r.coo_name] = (agg[r.coo_name] || 0) + total;
+          }
+        });
+        return Object.entries(agg)
+          .map(([coo, total]) => ({ coo, total }))
+          .sort((a,b) => b.total - a.total)
+          .slice(0,5);
+      }
+    } catch (err) {
+      console.error('Direct fallback fetch failed:', err);
+    }
+    return null;
   }
 
   async function queueOfflineRequest(endpoint, options) {
