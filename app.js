@@ -2432,7 +2432,7 @@
   // =========================================================
   // PWA MANIFEST & SERVICE WORKER & OFFLINE SYNC
   // =========================================================
-  const API_BASE = 'http://localhost:8000/api'; // Or relative '/api' if hosted together
+  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : '/api';
 
   // Register real service worker
   if ('serviceWorker' in navigator) {
@@ -2468,7 +2468,7 @@
   async function fetchExternalDirectly(endpoint) {
     try {
       if (endpoint.startsWith('/external/reports')) {
-        const resp = await fetch('https://api.reliefweb.int/v2/reports?appname=mdaad_now&limit=5&filter[field]=primary_country&filter[value]=Lebanon&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date');
+        const resp = await fetch('https://api.reliefweb.int/v2/reports?appname=mdaadnow-humanitarian-app&limit=5&filter[field]=primary_country&filter[value]=Lebanon&sort[]=date:desc&fields[include][]=title&fields[include][]=source&fields[include][]=url&fields[include][]=date');
         const data = await resp.json();
         return (data.data || []).map(item => ({
           id: 'rw-' + item.fields.url.split('/').pop(),
@@ -2482,20 +2482,20 @@
       }
       
       if (endpoint === '/external/disasters/count') {
-        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaad_now&preset=external&limit=0');
+        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaadnow-humanitarian-app&preset=external&limit=0');
         const data = await resp.json();
         return { count: data.totalCount || 0 };
       }
       
       if (endpoint === '/external/hdx/presence') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaad_now&location_name=Lebanon&admin_level=0&output_format=json');
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaadnow&location_name=Lebanon&admin_level=0&output_format=json');
         const data = await resp.json();
         const orgs = new Set((data.data || []).map(i => i.org_name).filter(Boolean));
         return { count: orgs.size, source: 'OCHA HDX / 3W' };
       }
       
       if (endpoint === '/external/hdx/funding') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaad_now&location_name=Lebanon&output_format=json');
+        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaadnow&location_name=Lebanon&output_format=json');
         const data = await resp.json();
         let totalReq = 0, totalFund = 0;
         (data.data || []).forEach(i => {
@@ -2507,7 +2507,7 @@
       }
       
       if (endpoint === '/external/unhcr/population') {
-        const resp = await fetch('https://api.unhcr.org/stats/v1/population?year=2023&coa=LBN');
+        const resp = await fetch('https://api.unhcr.org/population/v1/population?year=2023&coa=LBN');
         const data = await resp.json();
         const records = data.data || [];
         const agg = {};
