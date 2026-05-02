@@ -2502,6 +2502,7 @@
   // PWA MANIFEST & SERVICE WORKER & OFFLINE SYNC
   // =========================================================
   const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : '/api';
+  console.log('Mdaad Now Initialized. API Base:', API_BASE);
 
   // Register real service worker
   if ('serviceWorker' in navigator) {
