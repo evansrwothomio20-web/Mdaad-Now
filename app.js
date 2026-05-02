@@ -2565,21 +2565,15 @@
           .slice(0,5);
       }
       
-      if (endpoint === '/external/disasters/count') {
-        const resp = await fetch('https://api.reliefweb.int/v2/disasters?appname=mdaadnow&preset=external&limit=0');
-        const data = await resp.json();
-        return { count: data.totalCount || 0 };
-      }
-      
       if (endpoint === '/external/hdx/presence') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaadnow&location_name=Lebanon&admin_level=0&output_format=json');
+        const resp = await fetch(`/api/humanitarian-data?type=hdx-presence&country=Lebanon`);
         const data = await resp.json();
         const orgs = new Set((data.data || []).map(i => i.org_name).filter(Boolean));
         return { count: orgs.size, source: 'OCHA HDX / 3W' };
       }
       
       if (endpoint === '/external/hdx/funding') {
-        const resp = await fetch('https://hapi.humdata.org/api/v2/coordination-context/funding?app_identifier=mdaadnow&location_name=Lebanon&output_format=json');
+        const resp = await fetch(`/api/humanitarian-data?type=hdx-funding&country=Lebanon`);
         const data = await resp.json();
         let totalReq = 0, totalFund = 0;
         (data.data || []).forEach(i => {
@@ -2591,12 +2585,12 @@
       }
       
       if (endpoint.startsWith('/external/hot/projects')) {
-        const resp = await fetch('https://tasks.hotosm.org/api/v2/projects/?text=Lebanon');
+        const resp = await fetch(`/api/humanitarian-data?type=hotosm&search=Lebanon`);
         const data = await resp.json();
         return (data.results || []).slice(0,10);
       }
     } catch (err) {
-      console.error('Direct fallback fetch failed:', err);
+      console.error('Unified proxy fetch failed:', err);
     }
     return null;
   }
