@@ -869,14 +869,14 @@
 
         <!-- Stats -->
         <div className="grid grid-cols-3 gap-3 fade-up">
-          <div className="bg-white rounded-premium shadow-premium p-3 text-center border border-slate-50 transition-transform active:scale-95">
+          <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
             <div className="text-2xl font-bold text-tealAccent">${verifiedCount}</div>
             <div className="flex flex-col mt-1">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Verified<br/>Resources</span>
               <span className="text-[9px] font-kufi text-slate-400 mt-0.5">الموارد الموثقة</span>
             </div>
           </div>
-          <div className="bg-white rounded-premium shadow-premium p-3 text-center border border-slate-50 transition-transform active:scale-95">
+          <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
             <div className="text-2xl font-bold text-actionOrange">${alertCount}</div>
             <div className="flex flex-col mt-1">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Active<br/>Alerts</span>
@@ -893,25 +893,31 @@
         </div>
 
         <!-- Quick actions -->
-        <div className="fade-up flex flex-col gap-3">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="fade-up flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center px-2">
             <button onClick=${props.onRequestHelp}
-              className="flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-actionOrange/20"
-              style=${{background: 'linear-gradient(135deg, #C2410C, #9A3412)'}}
+              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              style=${{background: '#E2725B'}}
             >
-              <span className="text-xs font-bold uppercase tracking-wider">REQUEST HELP</span>
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-hand-holding-heart text-sm"></i>
+                <span className="text-xs font-bold uppercase tracking-wider">REQUEST HELP</span>
+              </div>
               <span className="text-[11px] font-kufi opacity-90">طلب المساعدة</span>
             </button>
             <button onClick=${props.onSuggest}
-              className="flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-navy/20"
-              style=${{background: 'linear-gradient(135deg, #1A365D, #102A43)'}}
+              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              style=${{background: '#475569'}}
             >
-              <span className="text-xs font-bold uppercase tracking-wider">REPORT UPDATE</span>
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-bullhorn text-sm"></i>
+                <span className="text-xs font-bold uppercase tracking-wider">REPORT UPDATE</span>
+              </div>
               <span className="text-[11px] font-kufi opacity-90">إبلاغ عن تحديث</span>
             </button>
             <button onClick=${() => props.setTab('briefs')}
-              className="col-span-2 md:col-span-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-teal-700/20"
-              style=${{background: 'linear-gradient(135deg, #0F766E, #0D9488)'}}
+              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              style=${{background: '#649173'}}
             >
               <div className="flex items-center gap-2">
                 <i className="fa-solid fa-file-lines text-sm"></i>
@@ -929,6 +935,15 @@
               <span className="text-[10px] font-kufi text-slate-400 leading-none">البحث عن مساعدة</span>
             </div>
           </button>
+        </div>
+
+        <!-- Impact Update Ticker -->
+        <div className="fade-up flex items-center justify-between px-5 py-3 bg-tealAccent/5 rounded-2xl border border-tealAccent/10">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 bg-tealAccent rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-bold text-navy uppercase tracking-widest">Impact Update: 1,200+ Kits delivered this week</span>
+          </div>
+          <a href="#" className="text-[9px] font-black text-tealAccent uppercase tracking-widest hover:underline">Latest Story →</a>
         </div>
 
         <!-- Humanitarian Briefing -->
