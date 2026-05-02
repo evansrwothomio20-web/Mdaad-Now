@@ -95,8 +95,12 @@ async function networkFirstWithCache(request, cacheName) {
     const response = await fetch(request);
     if (response.ok) cache.put(request, response.clone());
     return response;
-  } catch {
-    return await cache.match(request);
+  } catch (err) {
+    const cached = await cache.match(request);
+    return cached || new Response(JSON.stringify({error: 'offline'}), { 
+      status: 503, 
+      headers: {'Content-Type': 'application/json'} 
+    });
   }
 }
 

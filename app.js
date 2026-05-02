@@ -2499,12 +2499,10 @@
   const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : '/api';
   console.log('Mdaad Now Initialized. API Base:', API_BASE);
 
-  // Register real service worker
+  // Kill any broken service workers to "un-brick" the site
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').catch(err => {
-        console.error('ServiceWorker registration failed: ', err);
-      });
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      for(let registration of registrations) { registration.unregister(); }
     });
   }
 
