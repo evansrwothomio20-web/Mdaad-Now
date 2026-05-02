@@ -894,20 +894,30 @@
 
         <!-- Quick actions -->
         <div className="fade-up flex flex-col gap-3">
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <button onClick=${props.onRequestHelp}
-              className="flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all active:scale-95 shadow-lg shadow-actionOrange/20"
+              className="flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-actionOrange/20"
               style=${{background: 'linear-gradient(135deg, #C2410C, #9A3412)'}}
             >
               <span className="text-xs font-bold uppercase tracking-wider">REQUEST HELP</span>
               <span className="text-[11px] font-kufi opacity-90">طلب المساعدة</span>
             </button>
             <button onClick=${props.onSuggest}
-              className="flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all active:scale-95 shadow-lg shadow-navy/20"
+              className="flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-navy/20"
               style=${{background: 'linear-gradient(135deg, #1A365D, #102A43)'}}
             >
               <span className="text-xs font-bold uppercase tracking-wider">REPORT UPDATE</span>
               <span className="text-[11px] font-kufi opacity-90">إبلاغ عن تحديث</span>
+            </button>
+            <button onClick=${() => props.setTab('briefs')}
+              className="col-span-2 md:col-span-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-lg shadow-teal-700/20"
+              style=${{background: 'linear-gradient(135deg, #0F766E, #0D9488)'}}
+            >
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-file-lines text-sm"></i>
+                <span className="text-xs font-bold uppercase tracking-wider">COUNTRY BRIEFS</span>
+              </div>
+              <span className="text-[11px] font-kufi opacity-90">ملخصات الدول</span>
             </button>
           </div>
           <button onClick=${function(){ props.setTab('resources'); }}
@@ -2181,6 +2191,7 @@
       { key:'home', label:'Home', arabic:'الرئيسية', icon:'fa-house' },
       { key:'map', label:'Map', arabic:'الخريطة', icon:'fa-map-location-dot' },
       { key:'volunteer', label:'Volunteer', arabic:'تطوع', icon:'fa-hands-holding-child' },
+      { key:'briefs', label:'Briefs', arabic:'ملخصات', icon:'fa-file-lines' },
       { key:'resources', label:'Resources', arabic:'الموارد', icon:'fa-building' },
     ];
     if (user.role === 'verified_org') {
