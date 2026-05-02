@@ -2504,8 +2504,8 @@
   // =========================================================
   // PWA MANIFEST & SERVICE WORKER & OFFLINE SYNC
   // =========================================================
-  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : '/api';
-  console.log('Mdaad Now Initialized. API Base:', API_BASE);
+  const API_BASE = '/api';
+  console.log('Mdaad Now Initialized. Production API Base:', API_BASE);
 
   // Kill any broken service workers to "un-brick" the site
   if ('serviceWorker' in navigator) {
@@ -2526,7 +2526,15 @@
       const url = `${API_BASE}${endpoint}`;
       const response = await fetch(url, { ...options, signal: controller.signal });
       clearTimeout(timeoutId);
-      if (response.ok) return await response.json();
+      if (response.ok) {
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.error('Invalid JSON response:', text.slice(0,100));
+          return null;
+        }
+      }
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === 'TypeError' || err.name === 'AbortError') {
