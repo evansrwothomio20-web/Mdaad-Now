@@ -2212,15 +2212,23 @@
           setCampaigns(safeCampData);
           setUpdates(feedUpdates);
 
-          // Fetch external updates from ReliefWeb and prepend them
-          apiFetch('/external/reports').then(function(externalData){
-            if (externalData && Array.isArray(externalData)) {
-              setUpdates(function(prev){
-                var existing = prev.filter(function(u){ return !u.id.toString().startsWith('rw-'); });
-                return [...externalData, ...existing];
-              });
+          // Sync via Proxy logic
+          const syncProxy = async () => {
+            try {
+              const response = await fetch('/api/humanitarian-data?type=reliefweb&country=Lebanon');
+              const data = await response.json();
+              if (data && Array.isArray(data)) {
+                setUpdates(function(prev){
+                  var existing = prev.filter(function(u){ return !u.id.toString().startsWith('rw-'); });
+                  return [...data, ...existing];
+                });
+                console.log("Data successfully synced via Proxy");
+              }
+            } catch (err) {
+              console.error("Proxy fetch failed:", err);
             }
-          });
+          };
+          syncProxy();
 
           // Fetch external disasters count
           apiFetch('/external/disasters/count').then(function(data){
