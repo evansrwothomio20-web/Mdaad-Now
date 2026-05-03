@@ -7,9 +7,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "npx tailwindcss -i ./src/input.css -o ./styles.css",
-    "watch": "npx tailwindcss -i ./src/input.css -o ./styles.css --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tailwindcss -i ./index.css -o ./styles.css",
+    "test": "node api/index.test.js"
   },
   "repository": {
     "type": "git",
