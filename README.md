@@ -39,4 +39,4 @@ Vercel rewrites route all `/api/*` requests to the unified Node.js handler at `a
 | `/api/external/*` | GET | Proxied humanitarian data from global providers |
 
 ---
-*Built with excellence by Antigravity for the Mdaad Humanitarian Network.*
+*Built with excellence for the Mdaad Humanitarian Network.*
