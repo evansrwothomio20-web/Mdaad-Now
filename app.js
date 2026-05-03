@@ -536,12 +536,12 @@
             <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
             <span className="text-[11px] text-slate-400">${timeAgo(u.created_at)}</span>
             ${u.url && html`
-              <>
+              <${React.Fragment}>
                 <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                 <a href="${u.url}" target="_blank" rel="noopener noreferrer" className="text-[11px] text-tealAccent hover:underline font-bold">
                   View Source <i className="fa-solid fa-arrow-up-right-from-square text-[8px] ml-0.5"></i>
                 </a>
-              </>
+              </${React.Fragment}>
             `}
           </div>
         </div>
