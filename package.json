@@ -1,0 +1,28 @@
+{
+  "name": "mdaad-now",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "build": "npx tailwindcss -i ./src/input.css -o ./styles.css",
+    "watch": "npx tailwindcss -i ./src/input.css -o ./styles.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evansrwothomio20-web/Mdaad-Now.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/evansrwothomio20-web/Mdaad-Now/issues"
+  },
+  "homepage": "https://github.com/evansrwothomio20-web/Mdaad-Now#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.13",
+    "tailwindcss": "^3.4.1"
+  }
+}
