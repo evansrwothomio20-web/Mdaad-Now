@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tailwindcss -i ./index.css -o ./styles.css",
+    "build:css": "tailwindcss -i ./index.css -o ./styles.css",
     "test": "node api/index.test.js"
   },
   "repository": {
