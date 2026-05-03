@@ -612,7 +612,7 @@
         ar: 'وضع الإقامة والأهلية القانونية', 
         icon: 'fa-user-shield', 
         source: 'IOM',
-        url: 'https://lebanon.iom.int/'
+        url: 'https://www.iom.int/countries/lebanon'
       },
       { 
         en: 'Gender-Based Violence (GBV) Protection', 
@@ -653,7 +653,7 @@
         ar: 'تأشيرات الحماية المؤقتة', 
         icon: 'fa-file-signature', 
         source: 'MOI',
-        url: 'https://www.interior.gov.lb/'
+        url: 'http://www.moim.gov.lb/'
       },
       { 
         en: 'Access to Legal Aid', 
