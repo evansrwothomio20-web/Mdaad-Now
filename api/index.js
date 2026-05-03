@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
   }
 
   const parsedUrl = url.parse(req.url, true);
-  const path = parsedUrl.pathname.replace('/api', '');
+  const path = parsedUrl.pathname.replace('/api', '').replace(/\/$/, '') || '/';
 
   console.log(`API Request: ${req.method} ${path}`);
 
@@ -117,7 +117,7 @@ module.exports = async (req, res) => {
 
   try {
     // Basic Health Route
-    if (path === '/health' || path === '') {
+    if (path === '/health' || path === '/') {
       return res.status(200).json({ status: "online", environment: "production", version: "1.5.0-investor-demo" });
     }
 
@@ -129,43 +129,48 @@ module.exports = async (req, res) => {
 
     // Campaigns Route
     if (path === '/campaigns') {
-      return res.status(200).json([
-        {
-          id: 1, org_id: 2, title: "200 Blankets for District 3", category: "Shelter", urgency_level: "High", status: "active",
-          description: "Providing warmth for displaced families in the old school compound during the cold front.",
-          location_label: "District 3", location_coords: { lat: 37.066, lng: 37.383 },
-          quantity_needed: 200, quantity_unit: "units", quantity_fulfilled: 145, volunteer_slots: 5,
-          created_at: new Date(Date.now() - 86400000 * 2).toISOString()
-        },
-        {
-          id: 2, org_id: 2, title: "Emergency Solar Lighting", category: "Infrastructure", urgency_level: "Medium", status: "active",
-          description: "Installing 50 solar-powered street lights for safety in transition camps.",
-          location_label: "Sector C", location_coords: { lat: 37.067, lng: 37.384 },
-          quantity_needed: 50, quantity_unit: "lights", quantity_fulfilled: 12, volunteer_slots: 8,
-          created_at: new Date(Date.now() - 86400000 * 5).toISOString()
-        },
-        {
-          id: 3, org_id: 1, title: "Mobile Pediatric Clinic", category: "Medical", urgency_level: "Critical", status: "active",
-          description: "Operating a 24-hour mobile clinic for children under 5 in remote settlement areas.",
-          location_label: "District 5", location_coords: { lat: 37.065, lng: 37.382 },
-          quantity_needed: 1000, quantity_unit: "consultations", quantity_fulfilled: 680, volunteer_slots: 4,
-          created_at: new Date(Date.now() - 86400000 * 1).toISOString()
-        },
-        {
-          id: 4, org_id: 3, title: "Clean Water Access Point", category: "Water", urgency_level: "High", status: "active",
-          description: "Repairing high-capacity water filtration systems serving 2,500 people.",
-          location_label: "North Sector", location_coords: { lat: 37.068, lng: 37.385 },
-          quantity_needed: 5, quantity_unit: "filters", quantity_fulfilled: 3, volunteer_slots: 2,
-          created_at: new Date(Date.now() - 86400000 * 3).toISOString()
-        },
-        {
-          id: 5, org_id: 2, title: "Education Support Kits", category: "Education", urgency_level: "Medium", status: "active",
-          description: "Providing school supplies and stationery for 500 students in temporary learning centers.",
-          location_label: "Sector B", location_coords: { lat: 37.069, lng: 37.386 },
-          quantity_needed: 500, quantity_unit: "kits", quantity_fulfilled: 210, volunteer_slots: 10,
-          created_at: new Date(Date.now() - 86400000 * 4).toISOString()
-        }
-      ]);
+      if (req.method === 'GET') {
+        return res.status(200).json([
+          {
+            id: 1, org_id: 2, title: "200 Blankets for District 3", category: "Shelter", urgency_level: "High", status: "active",
+            description: "Providing warmth for displaced families in the old school compound during the cold front.",
+            location_label: "District 3", location_coords: { lat: 37.066, lng: 37.383 },
+            quantity_needed: 200, quantity_unit: "units", quantity_fulfilled: 145, volunteer_slots: 5,
+            created_at: new Date(Date.now() - 86400000 * 2).toISOString()
+          },
+          {
+            id: 2, org_id: 2, title: "Emergency Solar Lighting", category: "Infrastructure", urgency_level: "Medium", status: "active",
+            description: "Installing 50 solar-powered street lights for safety in transition camps.",
+            location_label: "Sector C", location_coords: { lat: 37.067, lng: 37.384 },
+            quantity_needed: 50, quantity_unit: "lights", quantity_fulfilled: 12, volunteer_slots: 8,
+            created_at: new Date(Date.now() - 86400000 * 5).toISOString()
+          },
+          {
+            id: 3, org_id: 1, title: "Mobile Pediatric Clinic", category: "Medical", urgency_level: "Critical", status: "active",
+            description: "Operating a 24-hour mobile clinic for children under 5 in remote settlement areas.",
+            location_label: "District 5", location_coords: { lat: 37.065, lng: 37.382 },
+            quantity_needed: 1000, quantity_unit: "consultations", quantity_fulfilled: 680, volunteer_slots: 4,
+            created_at: new Date(Date.now() - 86400000 * 1).toISOString()
+          },
+          {
+            id: 4, org_id: 3, title: "Clean Water Access Point", category: "Water", urgency_level: "High", status: "active",
+            description: "Repairing high-capacity water filtration systems serving 2,500 people.",
+            location_label: "North Sector", location_coords: { lat: 37.068, lng: 37.385 },
+            quantity_needed: 5, quantity_unit: "filters", quantity_fulfilled: 3, volunteer_slots: 2,
+            created_at: new Date(Date.now() - 86400000 * 3).toISOString()
+          },
+          {
+            id: 5, org_id: 2, title: "Education Support Kits", category: "Education", urgency_level: "Medium", status: "active",
+            description: "Providing school supplies and stationery for 500 students in temporary learning centers.",
+            location_label: "Sector B", location_coords: { lat: 37.069, lng: 37.386 },
+            quantity_needed: 500, quantity_unit: "kits", quantity_fulfilled: 210, volunteer_slots: 10,
+            created_at: new Date(Date.now() - 86400000 * 4).toISOString()
+          }
+        ]);
+      }
+      if (req.method === 'POST') {
+        return res.status(201).json({ success: true, id: Math.floor(Math.random() * 10000), message: "Campaign successfully created." });
+      }
     }
 
     // Requests Route
