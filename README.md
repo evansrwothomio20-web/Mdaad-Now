@@ -16,7 +16,7 @@ Mdaad Now is a high-performance, resilient coordination platform designed for hu
 
 ### 3. Integrated Security & Privacy
 - **Coordination Masking**: Automatic geometric masking for sensitive coordination points.
-- **Verified Actor System**: TrustScore engine for NGOs based on registration data and field history.
+- - **Verified Actor System**: TrustScore engine for NGOs based on registration data and field history.
 
 ## Development
 
