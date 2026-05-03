@@ -1,30 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#D27D56">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="description" content="Humanitarian coordination for low-bandwidth environments">
-  <title>Mdaad Now</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mdaad Now | Humanitarian Coordination Ecosystem</title>
+  
+  <!-- SEO & PWA -->
+  <meta name="description" content="High-performance humanitarian coordination platform for low-bandwidth environments.">
   <link rel="manifest" href="./manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Readex+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0D9488">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="./index.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="./styles.css">
-</head>
-<body>
-  <div id="root"></div>
 
+  <!-- Core Libraries (CDN for demo speed, bundled in prod) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-50 selection:bg-teal-500/30">
+  <div id="root">
+    <!-- Loading State -->
+    <div class="flex flex-col items-center justify-center min-h-screen space-y-4">
+      <div class="relative w-16 h-16">
+        <div class="absolute inset-0 border-4 border-teal-500/20 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      <p class="text-teal-500 font-display font-bold tracking-widest uppercase text-xs animate-pulse">Initializing Ecosystem</p>
+    </div>
+  </div>
 
-  <script src="./app.js?v=9"></script>
+  <!-- Application Logic -->
+  <script src="./app.js?v=11"></script>
 </body>
 </html>
