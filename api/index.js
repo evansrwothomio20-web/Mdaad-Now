@@ -198,6 +198,37 @@ module.exports = async (req, res) => {
 
     // Resources Route
     if (path === '/resources') {
+      try {
+        const hdxUrl = `https://hapi.humdata.org/api/v2/coordination-context/operational-presence?app_identifier=mdaad&location_name=Lebanon&admin_level=0&output_format=json`;
+        const hdxResp = await fetch(hdxUrl);
+        const hdxData = await hdxResp.json();
+        
+        const orgMap = {};
+        (hdxData.data || []).forEach(item => {
+           if (item.org_name && !orgMap[item.org_name]) {
+             orgMap[item.org_name] = {
+               id: item.org_acronym || Math.random().toString(36).substring(7),
+               name: item.org_name,
+               category: (item.org_type_description || 'ngo').toLowerCase(),
+               description: `Sector(s): ${item.sector_name || 'Multi-sector'}`,
+               verification_status: "verified",
+               trust_score: 95,
+               last_updated: new Date().toISOString()
+             };
+           } else if (item.org_name && item.sector_name) {
+             if (!orgMap[item.org_name].description.includes(item.sector_name)) {
+                orgMap[item.org_name].description += `, ${item.sector_name}`;
+             }
+           }
+        });
+        
+        const orgs = Object.values(orgMap).slice(0, 50); // Get top 50
+        if (orgs.length > 0) return res.status(200).json(orgs);
+      } catch (err) {
+        console.warn("Failed to fetch HDX resources", err);
+      }
+
+      // Fallback
       return res.status(200).json([
         { id: 1, name: "Al-Rahma Hospital", category: "hospital", address: "District 5, Building 12", description: "24/7 Trauma and Pediatrics. Verified donor facility.", verification_status: "verified", trust_score: 98, last_updated: new Date().toISOString() },
         { id: 2, name: "Hope Beyond Borders", category: "ngo", address: "Sector C, Aid Coordination Office", description: "Logistics and food distribution expert. 12 active field teams.", verification_status: "verified", trust_score: 82, last_updated: new Date().toISOString() },

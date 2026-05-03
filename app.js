@@ -147,37 +147,154 @@ function ActivityFeed({ updates }) {
 function HomeView({ stats, updates }) {
   return html`
     <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <header className="flex justify-between items-end mb-8 pt-4">
-        <div>
-          <h1 className="text-4xl font-display font-extrabold tracking-tighter text-white">Mdaad Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">Coordinating Beirut Sector • <span className="font-kufi">قطاع بيروت</span></p>
-        </div>
-        <div className="flex space-x-2">
-           <button className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-             <i className="fa-solid fa-magnifying-glass"></i>
-           </button>
-           <button className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-             <i className="fa-solid fa-bell"></i>
-           </button>
-        </div>
+      <header className="mb-6 pt-4">
+        <h1 className="text-3xl font-display font-bold text-[#1a2e4c]">Welcome back</h1>
+        <p className="text-slate-400 text-sm font-kufi mt-1">مرحباً بك مجدداً</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <${StatCard} label="Active Needs" ar="الاحتياجات" value=${stats.needs} trend="+12%" icon="fa-hand-holding-hand" color="orange" />
-        <${StatCard} label="Deployed Units" ar="الوحدات" value=${stats.units} trend="Steady" icon="fa-truck-medical" color="teal" />
-        <${StatCard} label="Coverage" ar="التغطية" value="${stats.coverage}%" trend="+5.2%" icon="fa-chart-area" color="blue" />
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-slate-50 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="text-2xl font-extrabold text-teal-600">${stats.orgs}</div>
+          <div className="text-[9px] font-bold text-[#1a2e4c] mt-2 leading-tight">ACTIVE<br/>ORGS</div>
+          <div className="text-[7px] text-slate-400 mt-1 uppercase font-bold tracking-widest">OCHA HDX / 3W</div>
+        </div>
+        <div className="bg-slate-50 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="text-2xl font-extrabold text-[#e05b42]">${stats.alerts}</div>
+          <div className="text-[9px] font-bold text-[#1a2e4c] mt-2 leading-tight">ACTIVE<br/>ALERTS</div>
+          <div className="text-[7px] text-slate-400 mt-1 uppercase font-bold tracking-widest">RELIEFWEB V2</div>
+        </div>
+        <div className="bg-slate-50 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="text-2xl font-extrabold text-[#f59e0b]">${stats.funding}%</div>
+          <div className="text-[9px] font-bold text-[#1a2e4c] mt-2 leading-tight">FUNDING<br/>STATUS</div>
+          <div className="text-[7px] text-slate-400 mt-1 uppercase font-bold tracking-widest">OCHA FTS</div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <${ActivityFeed} updates=${updates} />
-        <div className=${UI.Card}>
-          <h3 className=${UI.Header}>Sector Overview</h3>
-          <div className="mt-6 aspect-video bg-slate-800/50 rounded-2xl border border-white/5 flex items-center justify-center overflow-hidden relative">
-            <img src="./mdaad_dashboard_hero_1777819843165.png" className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
-            <div className="relative text-center p-6">
-              <i className="fa-solid fa-map-location text-3xl text-teal-500/50 mb-3"></i>
-              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Interactive GIS Pending</p>
-              <button className="mt-4 text-xs font-bold text-teal-400 hover:text-teal-300">Switch to Map View →</button>
+      <div className="mt-8">
+        <h2 className="text-lg font-bold text-[#1a2e4c] uppercase tracking-wide">PROTECTION RISKS</h2>
+        <p className="text-slate-400 text-sm font-kufi mb-4">مخاطر الحماية</p>
+        
+        <div className="space-y-4">
+          <!-- Item 1 -->
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-id-card text-[#e05b42] text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Civil Documentation & Identity Verification</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">الوثائق الثبوتية والتحقق من الهوية</p>
+              <a href="https://www.unhcr.org/lebanon.html" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                UNHCR <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-user-shield text-[#e05b42] text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Residency Status & Legal Eligibility</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">وضع الإقامة والأهلية القانونية</p>
+              <a href="https://lebanon.iom.int" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                IOM <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-shield-heart text-[#e05b42] text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Gender-Based Violence (GBV) Protection</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">الحماية من العنف القائم على النوع الاجتماعي</p>
+              <a href="https://lebanon.unfpa.org" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                UNFPA <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEGAL CONTEXT -->
+      <div className="mt-10 border-l-4 border-teal-600 pl-5 py-2 rounded-l-2xl">
+        <h2 className="text-lg font-bold text-[#1a2e4c] uppercase tracking-wide">LEGAL CONTEXT</h2>
+        <p className="text-slate-400 text-sm font-kufi mb-4">السياق القانوني</p>
+        
+        <div className="space-y-4">
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-file-signature text-teal-600 text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Temporary Protection Visas</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">تأشيرات الحماية المؤقتة</p>
+              <a href="https://www.interior.gov.lb" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                MOI <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-scale-balanced text-teal-600 text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Access to Legal Aid</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">الوصول إلى المساعدة القانونية</p>
+              <a href="https://bba.org.lb" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                BAR ASSOCIATION <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERATIONAL GUIDANCE -->
+      <div className="mt-10 border-l-4 border-teal-600 pl-5 py-2 rounded-l-2xl">
+        <h2 className="text-lg font-bold text-[#1a2e4c] uppercase tracking-wide">OPERATIONAL GUIDANCE</h2>
+        <p className="text-slate-400 text-sm font-kufi mb-4">التوجيه العملياتي</p>
+        
+        <div className="space-y-4">
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-arrows-to-circle text-teal-600 text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Coordinate, Do Not Duplicate</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">التنسيق وعدم التكرار</p>
+              <a href="https://www.unocha.org" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                OCHA <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-users text-teal-600 text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Defer to Local Actors</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">إعطاء الأولوية للجهات الفاعلة المحلية</p>
+              <a href="https://www.redcross.org.lb" target="_blank" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                RED CRESCENT <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 rounded-xl p-4 flex items-start space-x-4 shadow-sm">
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0">
+              <i className="fa-solid fa-check-double text-teal-600 text-xl"></i>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-[#1a2e4c] text-sm leading-snug">Verify Before Sharing</h3>
+              <p className="text-slate-500 text-xs font-kufi mt-1">التحقق قبل المشاركة</p>
+              <a href="mailto:admin@mdaad.org" className="inline-block mt-3 px-3 py-1 bg-slate-100 text-[#1a2e4c] text-[10px] font-bold rounded-md hover:bg-slate-200 transition-colors uppercase tracking-wider">
+                MDAAD ADMIN <i className="fa-solid fa-arrow-up-right-from-square ml-1 opacity-70"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -186,21 +303,103 @@ function HomeView({ stats, updates }) {
   `;
 }
 
-// --- MAIN APP COMPONENT ---
-function App() {
-  const [tab, setTab] = useState('home');
-  const [stats, setStats] = useState({ needs: 142, units: 28, coverage: 74 });
-  const [updates, setUpdates] = useState([
-    { id: 1, title: 'Blanket Distribution', description: '200 units delivered to Sector 7 Refugee Camp', time: '14:20', type: 'delivery' },
-    { id: 2, title: 'Medevac Required', description: 'Critical transport needed from District 4 Clinic', time: '14:15', type: 'incident' },
-    { id: 3, title: 'Water Point Restored', description: 'Filtration unit active in North Settlement', time: '13:50', type: 'delivery' },
-    { id: 4, title: 'Supply Convoy Logged', description: 'WFP convoy entering through Masnaa border', time: '13:30', type: 'delivery' }
-  ]);
+// 5. NGO View Component
+function NgoView() {
+  const [orgs, setOrgs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initial sync
-    setTimeout(() => setLoading(false), 1200);
+    async function fetchOrgs() {
+      try {
+        const data = await api.fetch('/resources');
+        setOrgs(data || []);
+      } catch (err) {
+        console.error("Failed to fetch orgs", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrgs();
+  }, []);
+
+  return html`
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      <header className="flex justify-between items-end mb-8 pt-4">
+        <div>
+          <h1 className="text-4xl font-display font-extrabold tracking-tighter text-white">Organizations</h1>
+          <p className="text-slate-500 text-sm mt-1">Verified Partners & NGOs • <span className="font-kufi">المنظمات المعتمدة</span></p>
+        </div>
+      </header>
+
+      ${loading ? html`<div className="text-center text-slate-500 py-10"><i className="fa-solid fa-spinner fa-spin text-2xl mb-4"></i><p>Loading organizations...</p></div>` : html`
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${orgs.map(org => html`
+            <div key=${org.id} className=${UI.Card}>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-bold text-white">${org.name}</h3>
+                ${org.verification_status === 'verified' && html`<span className=${UI.Badge('teal')}><i className="fa-solid fa-check-circle mr-1"></i>Verified</span>`}
+              </div>
+              <p className="text-sm text-slate-400 mb-4">${org.description}</p>
+              <div className="flex justify-between items-center text-xs text-slate-500">
+                <span><i className="fa-solid fa-tag mr-1"></i>${org.category.toUpperCase()}</span>
+                <span>Trust Score: <span className="font-bold text-teal-400">${org.trust_score}%</span></span>
+              </div>
+            </div>
+          `)}
+        </div>
+      `}
+    </div>
+  `;
+}
+
+// --- MAIN APP COMPONENT ---
+function App() {
+  const [tab, setTab] = useState('home');
+  const [stats, setStats] = useState({ orgs: 0, alerts: 0, funding: 0 });
+  const [updates, setUpdates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function syncData() {
+      try {
+        const [disasters, presence, funding, alerts] = await Promise.all([
+          api.fetch('/humanitarian-data?type=disasters/count'),
+          api.fetch('/humanitarian-data?type=hdx/presence'),
+          api.fetch('/humanitarian-data?type=hdx/funding'),
+          api.fetch('/humanitarian-data?type=reliefweb')
+        ]);
+
+        setStats({
+          orgs: presence?.count || 0,
+          alerts: disasters?.count || 0,
+          funding: funding?.percent || 0
+        });
+
+        if (alerts && alerts.length > 0 && !alerts.queued) {
+          const liveUpdates = alerts.map((a, i) => ({
+            id: a.id || i,
+            title: `Source: ${a.reported_by || 'ReliefWeb'}`,
+            description: a.description,
+            time: a.created_at ? new Date(a.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now',
+            type: a.category === 'Safety' ? 'incident' : 'delivery'
+          }));
+          setUpdates(liveUpdates);
+        } else {
+          // Fallback if no real alerts came through
+          setUpdates([
+            { id: 1, title: 'Blanket Distribution', description: '200 units delivered to Sector 7 Refugee Camp', time: '14:20', type: 'delivery' },
+            { id: 2, title: 'Medevac Required', description: 'Critical transport needed from District 4 Clinic', time: '14:15', type: 'incident' },
+            { id: 3, title: 'Water Point Restored', description: 'Filtration unit active in North Settlement', time: '13:50', type: 'delivery' }
+          ]);
+        }
+      } catch (err) {
+        console.error("Sync error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    syncData();
   }, []);
 
   if (loading) return null; // Root loading handled in HTML
@@ -209,7 +408,8 @@ function App() {
     <div className="min-h-screen pb-32">
       <main>
         ${tab === 'home' && html`<${HomeView} stats=${stats} updates=${updates} />`}
-        ${tab !== 'home' && html`
+        ${tab === 'ngo' && html`<${NgoView} />`}
+        ${(tab !== 'home' && tab !== 'ngo') && html`
           <div className="flex flex-col items-center justify-center min-h-[70vh] opacity-50">
             <i className="fa-solid fa-screwdriver-wrench text-4xl mb-4"></i>
             <h2 className="text-xl font-bold">Module under optimization</h2>
