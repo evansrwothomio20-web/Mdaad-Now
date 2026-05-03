@@ -585,9 +585,9 @@
                   <div className="text-[12px] font-bold text-navy leading-tight">${item.en}</div>
                   <div className="text-[11px] font-kufi text-slate-500 mt-1 leading-snug">${item.ar}</div>
                   <div className="mt-2.5 flex items-center gap-2">
-                    <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5 transition-all group-hover:bg-navy/5 group-hover:text-navy cursor-pointer border border-transparent group-hover:border-navy/10">
+                    <a href=${item.url || '#'} target=${item.url && item.url !== '#' ? "_blank" : "_self"} rel="noopener noreferrer" className="text-[8px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5 transition-all group-hover:bg-navy/5 group-hover:text-navy cursor-pointer border border-transparent group-hover:border-navy/10 hover:text-tealAccent">
                       ${item.source} <i className="fa-solid fa-arrow-up-right-from-square text-[6px]"></i>
-                    </span>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -604,19 +604,22 @@
         en: 'Civil Documentation & Identity Verification', 
         ar: 'الوثائق الثبوتية والتحقق من الهوية', 
         icon: 'fa-id-card', 
-        source: 'UNHCR'
+        source: 'UNHCR',
+        url: 'https://www.unhcr.org/lb/'
       },
       { 
         en: 'Residency Status & Legal Eligibility', 
         ar: 'وضع الإقامة والأهلية القانونية', 
         icon: 'fa-user-shield', 
-        source: 'IOM'
+        source: 'IOM',
+        url: 'https://lebanon.iom.int/'
       },
       { 
         en: 'Gender-Based Violence (GBV) Protection', 
         ar: 'الحماية من العنف القائم على النوع الاجتماعي', 
         icon: 'fa-shield-heart', 
-        source: 'UNFPA'
+        source: 'UNFPA',
+        url: 'https://lebanon.unfpa.org/'
       }
     ];
 
@@ -625,19 +628,22 @@
         en: 'Coordinate, Do Not Duplicate', 
         ar: 'التنسيق وعدم التكرار', 
         icon: 'fa-arrows-to-circle', 
-        source: 'OCHA'
+        source: 'OCHA',
+        url: 'https://www.unocha.org/lebanon'
       },
       { 
         en: 'Defer to Local Actors', 
         ar: 'إعطاء الأولوية للجهات الفاعلة المحلية', 
         icon: 'fa-people-group', 
-        source: 'Red Crescent'
+        source: 'Red Cross',
+        url: 'https://www.redcross.org.lb/'
       },
       { 
         en: 'Verify Before Sharing', 
         ar: 'التحقق قبل المشاركة', 
         icon: 'fa-check-double', 
-        source: 'Mdaad Admin'
+        source: 'Mdaad Admin',
+        url: '#'
       }
     ];
 
@@ -646,13 +652,15 @@
         en: 'Temporary Protection Visas', 
         ar: 'تأشيرات الحماية المؤقتة', 
         icon: 'fa-file-signature', 
-        source: 'MOI'
+        source: 'MOI',
+        url: 'https://www.interior.gov.lb/'
       },
       { 
         en: 'Access to Legal Aid', 
         ar: 'الوصول إلى المساعدة القانونية', 
         icon: 'fa-scale-balanced', 
-        source: 'BAR Association'
+        source: 'BAR Association',
+        url: 'https://bba.org.lb/'
       }
     ];
 
