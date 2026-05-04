@@ -80,14 +80,14 @@
   const RESOURCE_ICONS = { ngo:'fa-hand-holding-heart', hospital:'fa-hospital', shelter:'fa-house-chimney' };
 
   const EMERGENCY_NUMBERS = [
-    { name:'Ambulance', number:'112', icon:'fa-truck-medical' },
-    { name:'Fire Department', number:'110', icon:'fa-fire-extinguisher' },
-    { name:'Police', number:'155', icon:'fa-shield-halved' },
-    { name:'UN OCHA', number:'+41 22 917 12 34', icon:'fa-globe' },
-    { name:'Red Cross / Red Crescent', number:'+41 22 730 42 22', icon:'fa-plus' },
-    { name:'WHO Emergency', number:'+41 22 791 21 11', icon:'fa-staff-snake' },
-    { name:'UNICEF', number:'+1 212 326 7000', icon:'fa-child-reaching' },
-    { name:'Local Crisis Helpline', number:'183', icon:'fa-phone-volume' },
+    { name:'Lebanese Red Cross', number:'140', icon:'fa-truck-medical' },
+    { name:'Police / MOI', number:'112', icon:'fa-shield-halved' },
+    { name:'Fire Department', number:'175', icon:'fa-fire-extinguisher' },
+    { name:'UNHCR Lebanon', number:'+961 4 726 111', icon:'fa-id-card' },
+    { name:'IOM Lebanon', number:'+961 1 841 701', icon:'fa-user-shield' },
+    { name:'UNFPA Lebanon', number:'+961 1 977 860', icon:'fa-shield-heart' },
+    { name:'UN OCHA', number:'+961 1 962 511', icon:'fa-arrows-to-circle' },
+    { name:'Beirut Bar Association', number:'+961 1 381 101', icon:'fa-scale-balanced' },
   ];
 
   // =========================================================
