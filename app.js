@@ -674,6 +674,279 @@
   }
 
   // =========================================================
+  // COUNTRY AWARENESS BRIEF COMPONENTS
+  // =========================================================
+  
+  const MOCK_BRIEF_DATA = {
+    lebanon: {
+      country: 'Lebanon',
+      keyConcerns: [
+        { text: 'Acute strain on public services including water and electricity in host communities.', source: 'UN OCHA' },
+        { text: 'Significant decline in household purchasing power due to currency depreciation.', source: 'World Bank' },
+        { text: 'Reported shortages of essential medicines for chronic diseases.', source: 'WHO' }
+      ],
+      displacement: 'Over 1.5 million refugees reported, with increasing patterns of secondary internal displacement due to localized pressures (UNHCR).',
+      health: {
+        items: [
+          '75% of healthcare facilities report operational challenges due to fuel costs.',
+          'Surveillance systems indicate rising risks of water-borne diseases in informal settlements.',
+          'Essential medicine supply chains remain fragile.'
+        ],
+        source: 'WHO / Ministry of Health'
+      },
+      economic: {
+        items: [
+          'Inflation rates for essential goods exceed 200% annually.',
+          'Household incomes have lost 90% of their real value since 2019.',
+          'Bank withdrawal restrictions affect humanitarian cash-transfer programs.'
+        ],
+        source: 'World Bank / IMF'
+      },
+      protection: {
+        items: [
+          'Documented challenges in civil documentation for newborns.',
+          'Increased risks of legal aid access for vulnerable non-nationals.',
+          'Protection monitoring reports rise in child labor as a coping mechanism.'
+        ],
+        source: 'UNHCR / HRW'
+      },
+      helpers: [
+        'Coordinate, do not duplicate: Always check the 3W matrix before initiating aid.',
+        'Protect dignity and data: Ensure consent before collecting personal identifiers.',
+        'Local first: Support existing community structures wherever possible.'
+      ]
+    },
+    sudan: {
+      country: 'Sudan',
+      keyConcerns: [
+        { text: 'Severe food insecurity affecting over 18 million people.', source: 'WFP' },
+        { text: 'Collapse of the banking system in conflict zones.', source: 'World Bank' },
+        { text: 'High risk of famine in Darfur and Kordofan regions.', source: 'IPC' }
+      ],
+      displacement: 'The largest internal displacement crisis globally, with over 10 million people moved internally and across borders (IOM).',
+      health: {
+        items: [
+          '80% of health facilities in conflict-affected areas are non-functional.',
+          'Outbreaks of cholera and malaria reported in displacement camps.',
+          'Acute shortage of trauma supplies and surgical equipment.'
+        ],
+        source: 'WHO'
+      },
+      economic: {
+        items: [
+          'Agricultural production down by 40% due to conflict.',
+          'Market disruptions leading to 300% price hikes for staple grains.',
+          'Complete loss of livelihoods for millions in urban centers.'
+        ],
+        source: 'FAO / World Bank'
+      },
+      protection: {
+        items: [
+          'Widespread reports of gender-based violence in temporary shelters.',
+          'Recruitment of minors by armed groups documented in multiple regions.',
+          'Lack of safe corridors for humanitarian access and civilian passage.'
+        ],
+        source: 'OHCHR / UNHCR'
+      },
+      helpers: [
+        'Security first: Never move without verified security clearance.',
+        'Neutrality is key: Maintain strict impartiality in conflict zones.',
+        'Communication: Use low-bandwidth tools for field reporting.'
+      ]
+    },
+    yemen: {
+      country: 'Yemen',
+      keyConcerns: [
+        { text: 'Fragile truce resulting in "no war, no peace" state with persistent needs.', source: 'UN OCHA' },
+        { text: 'Public sector salaries unpaid for years in many areas.', source: 'World Bank' },
+        { text: 'One of the worlds largest humanitarian crises with 18.2M people in need.', source: 'OCHA' }
+      ],
+      displacement: 'Protracted displacement for 4.5 million people, many displaced multiple times (UNHCR).',
+      health: {
+        items: [
+          'Only 50% of health facilities are fully functional.',
+          'Re-emergence of vaccine-preventable diseases like polio and measles.',
+          'High rates of child malnutrition (SAM/MAM) across all governorates.'
+        ],
+        source: 'WHO / UNICEF'
+      },
+      economic: {
+        items: [
+          'Dual currency systems creating additional transaction costs.',
+          'Dependency on food imports (90%) makes country vulnerable to global price shocks.',
+          'Oil exports—the primary revenue source—remain largely suspended.'
+        ],
+        source: 'World Bank'
+      },
+      protection: {
+        items: [
+          'High prevalence of explosive remnants of war (ERW) in returnee areas.',
+          'Legal barriers for female-headed households in accessing aid.',
+          'Restricted movement for aid workers affecting project monitoring.'
+        ],
+        source: 'UNHCR / NRC'
+      },
+      helpers: [
+        'Cultural sensitivity: Respect local norms and traditional structures.',
+        'Sustainability: Focus on small-scale rehabilitation of infrastructure.',
+        'Verification: Cross-check needs with local community leaders.'
+      ]
+    }
+  };
+
+  function KeyConcernAlert({ text, source }) {
+    return html`
+      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3 fade-up">
+        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+          <i className="fa-solid fa-triangle-exclamation text-xs"></i>
+        </div>
+        <div className="flex-1">
+          <p className="text-[12px] font-bold text-amber-900 leading-tight">${text}</p>
+          <span className="text-[9px] text-amber-500 font-black uppercase tracking-widest mt-1.5 inline-block">Source: ${source}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function AwarenessSectionCard({ title, icon, color, items, source }) {
+    return html`
+      <div className="bg-white rounded-premium shadow-premium border border-slate-100 p-5 fade-up">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-inner" style=${{backgroundColor: color + '15', color: color}}>
+            <i className=${'fa-solid ' + icon + ' text-lg'}></i>
+          </div>
+          <h3 className="font-black text-navy uppercase tracking-widest text-[11px]">${title}</h3>
+        </div>
+        <div className="space-y-4">
+          ${items.map(item => html`
+            <div key=${item} className="flex gap-3 items-start group">
+              <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 transition-transform group-hover:scale-150" style=${{backgroundColor: color}}></div>
+              <p className="text-[13px] text-slate-600 leading-relaxed font-medium">${item}</p>
+            </div>
+          `)}
+        </div>
+        <div className="mt-6 pt-4 border-t border-slate-50 flex justify-end">
+          <a href="#" className="text-[9px] font-black text-slate-300 hover:text-tealAccent transition-all uppercase tracking-widest flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50">
+            ${source} <i className="fa-solid fa-arrow-up-right-from-square text-[7px]"></i>
+          </a>
+        </div>
+      </div>
+    `;
+  }
+
+  function CountryAwarenessBrief({ brief, onBack }) {
+    return html`
+      <div className="space-y-8 fade-in">
+        <!-- Header -->
+        <div className="relative">
+          <button onClick=${onBack} className="absolute -top-12 left-0 text-navy font-black text-[10px] uppercase tracking-widest flex items-center gap-2 py-2 px-4 bg-white rounded-full shadow-sm border border-slate-100 active:scale-95 transition-all">
+            <i className="fa-solid fa-arrow-left"></i> Back to list
+          </button>
+          <div className="pt-4">
+            <h2 className="text-3xl font-black text-navy uppercase tracking-tighter">${brief.country} Awareness Brief</h2>
+            <div className="mt-3 flex items-center gap-3">
+               <span className="bg-navy text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded">Neutral Report</span>
+               <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Public Domain Intelligence</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div className="p-5 bg-slate-50 rounded-premium border border-slate-200 text-slate-500 italic text-[11px] leading-relaxed font-medium">
+          <i className="fa-solid fa-circle-info mr-2 text-slate-400"></i>
+          This is a Neutral Awareness Brief drawn from public sources (UN OCHA, World Bank, WHO, UNHCR) for high-level orientation only. This report does not constitute operational guidance or political position.
+        </div>
+
+        <!-- Key Concerns -->
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[11px] font-black text-navy uppercase tracking-widest">Primary Concerns</h3>
+            <span className="text-[9px] font-kufi text-slate-400">أبرز المخاوف</span>
+          </div>
+          <div className="space-y-3">
+            ${brief.keyConcerns.map((c, idx) => html`<${KeyConcernAlert} key=${idx} text=${c.text} source=${c.source} />`)}
+          </div>
+        </section>
+
+        <!-- Displacement Section -->
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[11px] font-black text-navy uppercase tracking-widest">Displacement Trends</h3>
+            <span className="text-[9px] font-kufi text-slate-400">اتجاهات النزوح</span>
+          </div>
+          <div className="bg-white p-6 rounded-premium shadow-premium border border-slate-100 flex gap-4">
+             <div className="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center text-navy flex-shrink-0">
+               <i className="fa-solid fa-people-arrows text-xl"></i>
+             </div>
+             <div>
+               <p className="text-[14px] text-slate-700 leading-relaxed font-medium">${brief.displacement}</p>
+             </div>
+          </div>
+        </section>
+
+        <!-- Thematic Cards -->
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <${AwarenessSectionCard} 
+            title="Health & Medical" 
+            icon="fa-heart-pulse" 
+            color="#3B82F6" 
+            items=${brief.health.items} 
+            source=${brief.health.source} 
+          />
+          <${AwarenessSectionCard} 
+            title="Economic Context" 
+            icon="fa-chart-line" 
+            color="#10B981" 
+            items=${brief.economic.items} 
+            source=${brief.economic.source} 
+          />
+          <${AwarenessSectionCard} 
+            title="Protection Notes" 
+            icon="fa-shield-halved" 
+            color="#8B5CF6" 
+            items=${brief.protection.items} 
+            source=${brief.protection.source} 
+          />
+          
+          <!-- Helper Orientation Card -->
+          <div className="bg-navy rounded-premium shadow-xl p-6 text-white fade-up">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                <i className="fa-solid fa-compass text-lg"></i>
+              </div>
+              <h3 className="font-black uppercase tracking-widest text-[11px]">Helper Orientation</h3>
+            </div>
+            <div className="space-y-4">
+              ${brief.helpers.map(h => html`
+                <div key=${h} className="flex gap-3 items-start">
+                  <i className="fa-solid fa-check-circle text-tealAccent mt-1 text-[10px]"></i>
+                  <p className="text-[12px] font-medium leading-relaxed opacity-90">${h}</p>
+                </div>
+              `)}
+            </div>
+            <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
+               <p className="text-[10px] uppercase tracking-widest font-black opacity-40 mb-2">Guiding Principle</p>
+               <p className="text-[11px] font-bold italic leading-relaxed">"Protect dignity and data as fiercely as you protect physical health."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Neutrality Closing -->
+        <div className="py-10 text-center border-t border-slate-100">
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Humanitarian Data Representation • Non-Political</p>
+           <div className="flex justify-center gap-6">
+              <span className="text-[9px] font-black text-slate-400">UN OCHA</span>
+              <span className="text-[9px] font-black text-slate-400">WORLD BANK</span>
+              <span className="text-[9px] font-black text-slate-400">WHO</span>
+              <span className="text-[9px] font-black text-slate-400">UNHCR</span>
+           </div>
+        </div>
+      </div>
+    `;
+  }
+
+
+  // =========================================================
   // RESOURCE CARD
   // =========================================================
   function ResourceCard(props) {
@@ -931,6 +1204,26 @@
             <div className="flex flex-col items-start">
               <span className="text-xs font-bold uppercase tracking-wider">Find Help</span>
               <span className="text-[10px] font-kufi text-slate-400 leading-none">البحث عن مساعدة</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Featured Awareness Brief CTA -->
+        <div className="fade-up px-2">
+          <button onClick=${() => props.setTab('briefs')} 
+            className="w-full bg-navy rounded-premium p-6 text-white shadow-xl flex items-center justify-between group active:scale-[0.98] transition-all">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">
+                🌍
+              </div>
+              <div className="text-left">
+                <h3 className="font-black uppercase tracking-widest text-[11px] opacity-60">Featured Awareness</h3>
+                <p className="text-lg font-bold">Country Situational Briefs</p>
+                <p className="text-[10px] font-kufi opacity-40">ملخصات التوعية الميدانية</p>
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-tealAccent transition-colors">
+              <i className="fa-solid fa-arrow-right"></i>
             </div>
           </button>
         </div>
@@ -1397,9 +1690,21 @@
   // BRIEFS VIEW (Trust Engine)
   // =========================================================
   function BriefsView(props) {
+    var [selectedCountry, setSelectedCountry] = useState(null);
     var sectionRef = useState('all');
     var section = sectionRef[0], setSection = sectionRef[1];
     var canApprove = props.user.role==='admin' || props.user.role==='verified_org';
+
+    if (selectedCountry) {
+      return html`
+        <div className="px-4 pb-12 pt-16">
+          <${CountryAwarenessBrief} 
+            brief=${MOCK_BRIEF_DATA[selectedCountry]} 
+            onBack=${() => setSelectedCountry(null)} 
+          />
+        </div>
+      `;
+    }
 
     var filtered = useMemo(function() {
       if (section==='pending') return props.updates.filter(function(u){ return !u.is_verified; });
@@ -1411,38 +1716,67 @@
     var sectionArabic = { all:'الكل', pending:'قيد المراجعة', verified:'تم التحقق' };
 
     return html`
-      <div className="px-4 pb-6 space-y-6">
+      <div className="px-4 pb-6 space-y-8">
         <div className="fade-up pt-4">
-          <h1 className="text-3xl font-bold text-navy">Country Briefs</h1>
-          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-wider">
-            Official displacement statistics and humanitarian intelligence / معلومات إنسانية وإحصاءات رسمية
+          <h1 className="text-3xl font-black text-navy uppercase tracking-tighter">Situational Briefs</h1>
+          <p className="text-[11px] font-kufi text-slate-400 mt-1 uppercase tracking-widest font-bold">
+            Humanitarian intelligence and verified field reports / معلومات إنسانية وتقارير ميدانية
           </p>
         </div>
 
+        <!-- Country Awareness Briefs Selection -->
+        <section className="fade-up fade-up-delay-1">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[11px] font-black text-navy uppercase tracking-widest">Country Awareness Briefs</h2>
+            <span className="text-[9px] font-kufi text-slate-400">ملخصات التوعية للدول</span>
+          </div>
+          <div className="grid grid-cols-1 gap-3">
+            ${Object.keys(MOCK_BRIEF_DATA).map(id => {
+              const b = MOCK_BRIEF_DATA[id];
+              return html`
+                <button key=${id} onClick=${() => setSelectedCountry(id)}
+                  className="group flex items-center justify-between p-5 bg-white rounded-premium border border-slate-100 shadow-premium hover:border-tealAccent/30 transition-all active:scale-[0.98]">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-2xl group-hover:bg-tealAccent/10 transition-colors">
+                      ${id === 'lebanon' ? '🇱🇧' : id === 'sudan' ? '🇸🇩' : '🇾🇪'}
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-bold text-navy text-base">${b.country}</h3>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-0.5">Updated 12h ago • Neutral Brief</p>
+                    </div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-tealAccent group-hover:text-white transition-all">
+                    <i className="fa-solid fa-chevron-right text-xs"></i>
+                  </div>
+                </button>
+              `;
+            })}
+          </div>
+        </section>
+
         <!-- Population at Risk Visualization -->
-        <div className="fade-up fade-up-delay-1 bg-white p-6 rounded-premium border border-slate-100 shadow-premium">
+        <div className="fade-up fade-up-delay-2 bg-white p-6 rounded-premium border border-slate-100 shadow-premium">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="text-sm font-black text-navy uppercase tracking-widest">Population at Risk</h3>
+              <h3 className="text-sm font-black text-navy uppercase tracking-widest">Global Displacement Context</h3>
               <p className="text-[10px] font-kufi text-slate-400">سياق النزوح وحالات اللجوء</p>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Country of Asylum: Lebanon</span>
-              <span className="text-[8px] font-black text-tealAccent uppercase tracking-widest mt-1">Source: UNHCR Refugee Statistics</span>
+              <span className="text-[8px] font-black text-tealAccent uppercase tracking-widest">Source: UNHCR Refugee Statistics</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             ${(props.unhcrData || []).map(function(item) {
               return html`
                 <div key=${item.coo} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-xs font-black text-navy uppercase tracking-widest">${item.coo}</span>
-                    <span className="text-[9px] font-kufi text-slate-400 mt-0.5">بلد المنشأ / Country of Origin</span>
+                    <span className="text-[10px] font-black text-navy uppercase tracking-widest">${item.coo}</span>
+                    <span className="text-[8px] font-kufi text-slate-400 mt-0.5">Country of Origin</span>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-lg font-black text-navy">${item.total.toLocaleString()}</span>
-                    <span className="text-[9px] font-kufi text-slate-400 mt-0.5">إجمالي النازحين / Total Displaced</span>
+                    <span className="text-base font-black text-navy">${item.total.toLocaleString()}</span>
+                    <span className="text-[8px] font-kufi text-slate-400 mt-0.5">Total Displaced</span>
                   </div>
                 </div>
               `;
@@ -1453,58 +1787,53 @@
           </div>
         </div>
 
-        <!-- Role indicator -->
-        ${canApprove ? html`
-          <div className="fade-up fade-up-delay-1 flex items-center gap-4 p-4 rounded-premium bg-tealAccent/5 border border-tealAccent/20">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-tealAccent shadow-lg shadow-tealAccent/20 text-white">
-              <i className="fa-solid fa-shield-check text-lg"></i>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-tealAccent uppercase tracking-widest">Coordinator Access</span>
-                <span className="text-[10px] px-2 py-0.5 bg-tealAccent/10 text-tealAccent rounded font-bold uppercase">${props.user.role}</span>
-              </div>
-              <p className="text-[10px] font-kufi text-slate-400 mt-0.5">لديك صلاحيات التحقق من التقارير</p>
+        <!-- Verified Updates Feed -->
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[11px] font-black text-navy uppercase tracking-widest">Field Coordinator Feed</h2>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-tealAccent rounded-full animate-pulse"></span>
+              <span className="text-[9px] font-black text-tealAccent uppercase tracking-widest">Live Updates</span>
             </div>
           </div>
-        ` : null}
 
-        <!-- Section tabs -->
-        <div className="fade-up fade-up-delay-1 flex p-1 bg-slate-50 rounded-2xl border border-slate-100">
-          ${['all','pending','verified'].map(function(s) {
-            var count = s==='pending' ? props.updates.filter(function(u){return !u.is_verified;}).length
-                       : s==='verified' ? props.updates.filter(function(u){return u.is_verified;}).length
-                       : props.updates.length;
-            var active = section === s;
-            return html`
-              <button key=${s} onClick=${function(){ setSection(s); }}
-                className=${'flex-1 flex flex-col items-center py-2.5 rounded-xl transition-all ' + (active ? 'bg-white text-navy shadow-premium' : 'text-slate-400 hover:text-slate-600')}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-black uppercase tracking-widest">${sectionLabels[s]}</span>
-                  ${count > 0 ? html`<span className=${'flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black ' + (s==='pending' ? 'bg-actionOrange text-white' : 'bg-slate-100 text-slate-400')}>${count}</span>` : null}
+          <!-- Section tabs -->
+          <div className="fade-up flex p-1 bg-slate-50 rounded-2xl border border-slate-100">
+            ${['all','pending','verified'].map(function(s) {
+              var count = s==='pending' ? props.updates.filter(function(u){return !u.is_verified;}).length
+                        : s==='verified' ? props.updates.filter(function(u){return u.is_verified;}).length
+                        : props.updates.length;
+              var active = section === s;
+              return html`
+                <button key=${s} onClick=${function(){ setSection(s); }}
+                  className=${'flex-1 flex flex-col items-center py-2.5 rounded-xl transition-all ' + (active ? 'bg-white text-navy shadow-premium' : 'text-slate-400 hover:text-slate-600')}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-widest">${sectionLabels[s]}</span>
+                    ${count > 0 ? html`<span className=${'flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-black ' + (s==='pending' ? 'bg-actionOrange text-white' : 'bg-slate-100 text-slate-400')}>${count}</span>` : null}
+                  </div>
+                  <span className="text-[9px] font-kufi opacity-60">${sectionArabic[s]}</span>
+                </button>
+              `;
+            })}
+          </div>
+
+          <!-- Updates list -->
+          <div className="space-y-4">
+            ${filtered.map(function(u) {
+              return html`<${UpdateCard} key=${u.id} update=${u} showActions=${canApprove && !u.is_verified} onVerify=${props.onVerify} onReject=${props.onReject} />`;
+            })}
+            ${filtered.length === 0 ? html`
+              <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fa-solid fa-clipboard-check text-3xl text-slate-200"></i>
                 </div>
-                <span className="text-[9px] font-kufi opacity-60">${sectionArabic[s]}</span>
-              </button>
-            `;
-          })}
-        </div>
-
-        <!-- Updates list -->
-        <div className="space-y-4 fade-up fade-up-delay-2">
-          ${filtered.map(function(u) {
-            return html`<${UpdateCard} key=${u.id} update=${u} showActions=${canApprove && !u.is_verified} onVerify=${props.onVerify} onReject=${props.onReject} />`;
-          })}
-          ${filtered.length === 0 ? html`
-            <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
-              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <i className="fa-solid fa-clipboard-check text-3xl text-slate-200"></i>
+                <p className="text-sm font-bold text-navy">${section==='pending' ? 'No pending reviews' : 'No updates found'}</p>
+                <p className="text-xs font-kufi text-slate-400 mt-1">لا توجد تقارير في هذا القسم</p>
               </div>
-              <p className="text-sm font-bold text-navy">${section==='pending' ? 'No pending reviews' : 'No updates found'}</p>
-              <p className="text-xs font-kufi text-slate-400 mt-1">لا توجد تقارير في هذا القسم</p>
-            </div>
-          ` : null}
-        </div>
+            ` : null}
+          </div>
+        </section>
       </div>
     `;
   }
