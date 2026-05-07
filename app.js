@@ -647,22 +647,6 @@
       }
     ];
 
-    const legalContext = [
-      { 
-        en: 'Temporary Protection Visas', 
-        ar: 'تأشيرات الحماية المؤقتة', 
-        icon: 'fa-file-signature', 
-        source: 'MOI',
-        url: 'http://www.moim.gov.lb/'
-      },
-      { 
-        en: 'Access to Legal Aid', 
-        ar: 'الوصول إلى المساعدة القانونية', 
-        icon: 'fa-scale-balanced', 
-        source: 'BAR Association',
-        url: 'https://bba.org.lb/'
-      }
-    ];
 
     return html`
       <div className="space-y-6 fade-up fade-up-delay-2">
@@ -685,12 +669,6 @@
           items=${operationalGuidance} 
         />
 
-        <${BriefCard} 
-          title="Legal Context" 
-          titleAr="السياق القانوني" 
-          color="#0D9488" 
-          items=${legalContext} 
-        />
       </div>
     `;
   }
