@@ -4,8 +4,8 @@
   "description": "Humanitarian Coordination Ecosystem",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#B83B2E",
+  "background_color": "#020617",
+  "theme_color": "#0D9488",
   "icons": [
     {
       "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>",
