@@ -885,7 +885,7 @@
         </div>
 
         <!-- Stats -->
-        <div className="grid grid-cols-3 gap-3 fade-up">
+        <div className="grid grid-cols-2 gap-3 fade-up">
           <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
             <div className="text-2xl font-bold text-tealAccent">${orgCount}</div>
             <div className="flex flex-col mt-1">
@@ -900,20 +900,13 @@
               <span className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">ReliefWeb v2</span>
             </div>
           </div>
-          <div className="bg-[#F1F5F9] rounded-premium shadow-premium p-3 text-center border border-slate-100 transition-transform active:scale-95">
-            <div className="text-2xl font-bold text-amber-500">${fundingPercent}%</div>
-            <div className="flex flex-col mt-1">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight leading-tight">Funding<br/>Status</span>
-              <span className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">OCHA FTS</span>
-            </div>
-          </div>
         </div>
 
         <!-- Quick actions -->
         <div className="fade-up flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center px-2">
+          <div className="flex flex-wrap md:flex-nowrap gap-4 justify-center items-center px-2">
             <button onClick=${props.onRequestHelp}
-              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              className="w-[47%] md:flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
               style=${{background: '#E2725B'}}
             >
               <div className="flex items-center gap-2">
@@ -923,7 +916,7 @@
               <span className="text-[11px] font-kufi opacity-90">طلب المساعدة</span>
             </button>
             <button onClick=${props.onSuggest}
-              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              className="w-[47%] md:flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
               style=${{background: '#475569'}}
             >
               <div className="flex items-center gap-2">
@@ -933,7 +926,7 @@
               <span className="text-[11px] font-kufi opacity-90">إبلاغ عن تحديث</span>
             </button>
             <button onClick=${() => props.setTab('briefs')}
-              className="w-full md:w-[220px] flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              className="w-[47%] md:flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
               style=${{background: '#649173'}}
             >
               <div className="flex items-center gap-2">
@@ -941,6 +934,16 @@
                 <span className="text-xs font-bold uppercase tracking-wider">COUNTRY BRIEFS</span>
               </div>
               <span className="text-[11px] font-kufi opacity-90">ملخصات الدول</span>
+            </button>
+            <button onClick=${props.onDonate}
+              className="w-[47%] md:flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+              style=${{background: '#8B5CF6'}}
+            >
+              <div className="flex items-center gap-2">
+                <i className="fa-solid fa-heart text-sm"></i>
+                <span className="text-xs font-bold uppercase tracking-wider">DONATE</span>
+              </div>
+              <span className="text-[11px] font-kufi opacity-90">تبرع الآن</span>
             </button>
           </div>
           <button onClick=${function(){ props.setTab('resources'); }}
@@ -2415,7 +2418,6 @@
             resources=${resources} 
             externalAlertCount=${externalAlertCount}
             hdxPresence=${hdxPresence}
-            hdxFunding=${hdxFunding}
             onSuggest=${function(){ setShowSuggest(true); }} 
             onRequestHelp=${function(){ setShowRequestHelp(true); }} 
             onDonate=${function(){ setShowDonation(true); }} 
@@ -2486,10 +2488,11 @@
             right: '20px',
             background: 'radial-gradient(circle at center, #EF4444, #B91C1C)'
           }}
-          aria-label="Emergency SOS contacts"
+          aria-label="Emergency contacts"
         >
-          <span className="font-black text-2xl tracking-tighter leading-none">SOS</span>
-          <span className="text-[10px] font-kufi font-bold mt-1 opacity-90">استغاثة</span>
+          <i className="fa-solid fa-phone-flip text-xl mb-1"></i>
+          <span className="font-black text-[9px] uppercase tracking-tighter leading-none">Emergency</span>
+          <span className="font-black text-[9px] uppercase tracking-tighter leading-none">Number</span>
         </button>
 
         <!-- Modals -->
