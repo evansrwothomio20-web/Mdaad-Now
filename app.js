@@ -2705,12 +2705,10 @@
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-navy shadow-lg shadow-navy/20">
-                <span className="font-serif text-white text-xl leading-none">M</span>
-              </div>
-              <div className="flex flex-col">
-                <h1 className="text-sm font-bold text-navy leading-tight tracking-tight uppercase">Mdaad Now</h1>
-                <span className="text-[10px] font-kufi text-slate-400 font-medium">نظام مدد للتنسيق الإنساني</span>
+              <img src="./logo.png" alt="Mdaad Now" className="h-10 w-auto object-contain" />
+              <div className="flex flex-col border-l border-slate-100 pl-3">
+                <span className="text-[10px] font-kufi text-slate-400 font-medium uppercase tracking-tight">Humanitarian Hub</span>
+                <span className="text-[9px] font-kufi text-slate-300 -mt-0.5">نظام مدد للتنسيق الإنساني</span>
               </div>
             </div>
             <${RoleSwitcher} role=${user.role} onChange=${handleRoleChange} />
