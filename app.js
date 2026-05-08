@@ -632,14 +632,14 @@
         url: 'https://www.unocha.org/lebanon'
       },
       { 
-        en: 'Defer to Local Actors', 
+        en: 'Local Response', 
         ar: 'إعطاء الأولوية للجهات الفاعلة المحلية', 
         icon: 'fa-people-group', 
         source: 'Red Cross',
         url: 'https://www.redcross.org.lb/'
       },
       { 
-        en: 'Verify Before Sharing', 
+        en: 'Verify with us', 
         ar: 'التحقق قبل المشاركة', 
         icon: 'fa-check-double', 
         source: 'Mdaad Admin',
