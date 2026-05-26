@@ -1186,16 +1186,6 @@
               </div>
               <span className="text-[11px] font-kufi opacity-90">ملخصات الدول</span>
             </button>
-            <button onClick=${props.onDonate}
-              className="w-[47%] md:flex-1 flex flex-col items-center justify-center gap-1 py-5 rounded-premium text-white transition-all hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
-              style=${{background: '#8B5CF6'}}
-            >
-              <div className="flex items-center gap-2">
-                <i className="fa-solid fa-heart text-sm"></i>
-                <span className="text-xs font-bold uppercase tracking-wider">DONATE</span>
-              </div>
-              <span className="text-[11px] font-kufi opacity-90">تبرع الآن</span>
-            </button>
           </div>
           <button onClick=${function(){ props.setTab('resources'); }}
             className="w-full flex items-center justify-center gap-3 py-4 rounded-premium bg-white border border-slate-100 text-slate-700 shadow-premium transition-all active:scale-[0.98]"
@@ -1868,58 +1858,7 @@
     `;
   }
 
-  // =========================================================
-  // DONATION MODAL
-  // =========================================================
-  function DonationModal(props) {
-    var options = [
-      { id: 'global1', name: 'PayPal International', icon: 'fa-brands fa-paypal', region: 'Global', type: 'paypal', arabic:'بايبال العالمي' },
-      { id: 'global2', name: 'Bitcoin / Crypto', icon: 'fa-brands fa-bitcoin', region: 'Global', type: 'crypto', arabic:'عملات رقمية' },
-      { id: 'eu1', name: 'SEPA Bank Transfer', icon: 'fa-solid fa-building-columns', region: 'Europe', type: 'bank', arabic:'تحويل بنكي أوروبا' },
-      { id: 'af1', name: 'Mobile Money (M-Pesa)', icon: 'fa-solid fa-mobile-screen', region: 'Africa', type: 'mobile', arabic:'الدفع عبر الهاتف' },
-      { id: 'asia1', name: 'AliPay / WeChat', icon: 'fa-brands fa-alipay', region: 'Asia', type: 'app', arabic:'علي باي / وي تشات' },
-    ];
 
-    return html`
-      <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Donation options">
-        <div className="absolute inset-0 bg-navy/40 backdrop-blur-sm" onClick=${props.onClose}></div>
-        <div className="slide-up relative bg-white rounded-3xl w-full max-w-[480px] overflow-hidden shadow-2xl">
-          <div className="bg-navy p-6 text-white relative">
-            <h2 className="text-xl font-bold">Support Our Mission</h2>
-            <p className="text-xs text-white/60 font-kufi mt-1">ساهم في دعم مهامنا الإنسانية</p>
-            <button onClick=${props.onClose} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all" aria-label="Close">
-              <i className="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar">
-            <p className="text-sm text-slate-500 leading-relaxed">Choose a convenient payment method for your region to help fund humanitarian efforts.</p>
-            ${options.map(function(opt) {
-              return html`
-                <button key=${opt.id} onClick=${function(){ showToast('Redirecting to ' + opt.name + '...', 'info'); props.onClose(); }} 
-                  className="w-full flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-tealAccent/30 hover:bg-white hover:shadow-premium transition-all active:scale-[0.98] group">
-                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0 text-actionOrange group-hover:bg-actionOrange group-hover:text-white transition-all">
-                    <i className=${opt.icon + ' text-xl'}></i>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <div className="font-bold text-navy text-sm">${opt.name}</div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">${opt.region}</span>
-                      <span className="text-[10px] font-kufi text-slate-300">· ${opt.arabic}</span>
-                    </div>
-                  </div>
-                  <i className="fa-solid fa-chevron-right text-slate-300 text-xs group-hover:translate-x-1 transition-transform"></i>
-                </button>
-              `;
-            })}
-          </div>
-          <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
-            <i className="fa-solid fa-shield-heart text-tealAccent"></i>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">100% of proceeds go to the field</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
 
   // =========================================================
   // TRUST SCORE — utility + meter component
@@ -2592,8 +2531,6 @@
     var showRequestHelpRef = useState(false);
     var showRequestHelp = showRequestHelpRef[0], setShowRequestHelp = showRequestHelpRef[1];
 
-    var showDonationRef = useState(false);
-    var showDonation = showDonationRef[0], setShowDonation = showDonationRef[1];
 
     var orgRef = React.useState(null);
     var org = orgRef[0], setOrg = orgRef[1];
@@ -2725,7 +2662,6 @@
             hdxPresence=${hdxPresence}
             onSuggest=${function(){ setShowSuggest(true); }} 
             onRequestHelp=${function(){ setShowRequestHelp(true); }} 
-            onDonate=${function(){ setShowDonation(true); }} 
             setTab=${setTab} 
           />`}
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
@@ -2804,7 +2740,6 @@
         ${showSOS ? html`<${SOSPanel} onClose=${function(){ setShowSOS(false); }} />` : null}
         ${showSuggest ? html`<${SuggestModal} user=${user} onClose=${function(){ setShowSuggest(false); }} onSubmit=${handleSuggest} />` : null}
         ${showRequestHelp ? html`<${RequestHelpModal} onClose=${function(){ setShowRequestHelp(false); }} />` : null}
-        ${showDonation ? html`<${DonationModal} onClose=${function(){ setShowDonation(false); }} />` : null}
         ${showPostNeed ? html`<${PostLiveNeedModal}
           org=${MOCK_NGO_ORG}
           onClose=${function(){ setShowPostNeed(false); }}
