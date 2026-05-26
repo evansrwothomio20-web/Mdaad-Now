@@ -1125,7 +1125,7 @@
     var alertCount = props.externalAlertCount || 0;
     var fundingPercent = props.hdxFunding ? props.hdxFunding.percent : 0;
     
-    var latestVerified = props.updates.filter(function(u){ return u.is_verified; }).slice(0,3);
+    var verifiedCount = props.updates.filter(function(u){ return u.is_verified; }).length;
     
     return html`
       <div className="px-4 pb-6 space-y-6">
@@ -1230,22 +1230,34 @@
         <!-- Humanitarian Briefing -->
         <${BilingualBriefing} />
 
-        <!-- Latest verified updates -->
-        <div className="fade-up fade-up-delay-3">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base text-bark">Latest Verified Updates</h2>
-            <button onClick=${function(){ props.setTab('briefs'); }} className="text-xs text-terracotta font-semibold hover:text-terracotta-dark">
-              View all <i className="fa-solid fa-arrow-right ml-0.5"></i>
-            </button>
-          </div>
-          <div className="space-y-3">
-            ${latestVerified.map(function(u) {
-              return html`<${UpdateCard} key=${u.id} update=${u} />`;
-            })}
-            ${latestVerified.length === 0 ? html`
-              <div className="text-center py-8 text-bark-lighter text-sm">No verified updates yet</div>
-            ` : null}
-          </div>
+        <!-- Latest verified updates CTA -->
+        <div className="fade-up fade-up-delay-3 px-2">
+          <button onClick=${() => props.setTab('verified-updates')}
+            className="w-full rounded-premium p-6 text-white shadow-xl flex items-center justify-between group active:scale-[0.98] transition-all relative overflow-hidden"
+            style=${{ background: 'linear-gradient(135deg, var(--teal-600), var(--teal-400))' }}
+          >
+            <!-- Background subtle pattern/glow for premium look -->
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-12 -translate-y-12 blur-xl pointer-events-none"></div>
+            
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">
+                🛡️
+              </div>
+              <div className="text-left">
+                <h3 className="font-black uppercase tracking-widest text-[11px] text-teal-100 flex items-center gap-1.5">
+                  Verified Feed 
+                  <span className="bg-teal-500/35 text-white text-[9px] px-2.5 py-0.5 rounded-full font-bold">
+                    ${verifiedCount} Reports
+                  </span>
+                </h3>
+                <p className="text-lg font-bold">Latest Verified Updates</p>
+                <p className="text-[10px] font-kufi opacity-80">التحديثات الميدانية الموثقة</p>
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-tealAccent transition-colors relative z-10">
+              <i className="fa-solid fa-arrow-right"></i>
+            </div>
+          </button>
         </div>
 
         <!-- Neutrality Note -->
@@ -1265,6 +1277,60 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================
+  // VERIFIED UPDATES VIEW
+  // =========================================================
+  function VerifiedUpdatesView(props) {
+    var verifiedUpdates = props.updates.filter(function(u){ return u.is_verified; });
+
+    return html`
+      <div className="px-4 pb-12 space-y-6 fade-in">
+        <!-- Header with Back Button -->
+        <div className="flex items-center gap-4 pt-4 mb-2">
+          <button onClick=${() => props.setTab('home')}
+            className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-navy hover:bg-slate-50 hover:text-tealAccent transition-all shadow-premium active:scale-95"
+            aria-label="Back to home"
+          >
+            <i className="fa-solid fa-arrow-left"></i>
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-navy leading-tight">Verified Updates</h1>
+            <p className="text-[11px] font-kufi text-slate-400 -mt-0.5 font-medium">التحديثات الميدانية الموثقة</p>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div className="p-5 bg-tealAccent/5 rounded-premium border border-tealAccent/10 flex items-start gap-4">
+          <div className="w-10 h-10 bg-tealAccent/10 rounded-xl flex items-center justify-center text-tealAccent flex-shrink-0">
+            <i className="fa-solid fa-shield-halved text-lg"></i>
+          </div>
+          <div>
+            <h3 className="text-xs font-black text-navy uppercase tracking-widest">Verified Humanitarian Intelligence</h3>
+            <p className="text-[11px] text-slate-500 leading-relaxed mt-1">
+              These updates are vetted and verified by field coordinators to ensure reliable ground coordination data.
+            </p>
+          </div>
+        </div>
+
+        <!-- Verified Updates list -->
+        <div className="space-y-4">
+          ${verifiedUpdates.map(function(u) {
+            return html`<${UpdateCard} key=${u.id} update=${u} />`;
+          })}
+          ${verifiedUpdates.length === 0 ? html`
+            <div className="text-center py-20 bg-white rounded-premium border border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fa-solid fa-clipboard-check text-3xl text-slate-200"></i>
+              </div>
+              <p className="text-sm font-bold text-navy">No verified updates yet</p>
+              <p className="text-xs font-kufi text-slate-400 mt-1">لا توجد تحديثات موثقة بعد</p>
+            </div>
+          ` : null}
         </div>
       </div>
     `;
@@ -2664,6 +2730,10 @@
             onRequestHelp=${function(){ setShowRequestHelp(true); }} 
             setTab=${setTab} 
           />`}
+          ${tab==='verified-updates' && html`<${VerifiedUpdatesView}
+            updates=${updates} 
+            setTab=${setTab} 
+          />`}
           ${tab==='map' && html`<${MapView} updates=${updates} user=${user} />`}
           ${tab==='volunteer' && html`<${VolunteerView} updates=${updates} user=${user} />`}
           ${tab==='resources' && html`<${ResourcesView} resources=${resources} user=${user} />`}
@@ -2693,7 +2763,7 @@
         <nav className="sticky bottom-0 z-40 bg-white/90 backdrop-blur-lg border-t border-slate-100 bottom-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)]" aria-label="Main navigation">
           <div className="flex px-2">
             ${tabs.map(function(t) {
-              var active = tab === t.key;
+              var active = tab === t.key || (t.key === 'home' && tab === 'verified-updates');
               var badge = t.key==='briefs' && pendingCount > 0 ? pendingCount : null;
               return html`
                 <button key=${t.key} onClick=${function(){ setTab(t.key); }}
